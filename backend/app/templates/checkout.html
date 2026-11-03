@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import rupees, hhmm, iso with context %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Checkout</h1>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="cb-card p-4">
+      <h2 class="h5 mb-1">{{ show.movie_title }}</h2>
+      <p class="text-muted mb-4">
+        {{ show.theatre_name }} &middot; {{ show.screen_name }}<br>
+        <span data-date="{{ iso(show.show_date) }}" data-date-relative>{{ iso(show.show_date) }}</span>, {{ hhmm(show.start_time) }}
+      </p>
+
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr class="small text-muted"><th>Seat</th><th>Category</th><th class="text-end">Price</th></tr>
+        </thead>
+        <tbody>
+          {% for seat in seats %}
+            <tr>
+              <td class="fw-semibold">{{ seat.row_label }}-{{ seat.seat_number }}</td>
+              <td>{{ seat.seat_category|title }}</td>
+              <td class="text-end">{{ rupees(seat.price) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="fw-bold">
+            <td colspan="2">Total</td>
+            <td class="text-end">{{ rupees(total) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <a class="small d-inline-block mt-3" href="{{ url_for('seat_select', show_id=show.show_id) }}">&larr; Change seats</a>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    {# main.py's /book reads seats and payment method from the session, so this form
+       only confirms. payment_method is also posted in case /book starts reading it. #}
+    <form method="post" action="{{ url_for('process_booking') }}" class="cb-card p-4" data-single-submit>
+      <h2 class="h5 mb-3">Payment</h2>
+      <div class="pay-option mb-3">
+        <span>
+          <span class="d-block small text-muted">Paying with</span>
+          <span class="fw-semibold">{{ {'UPI': 'UPI', 'CARD': 'Card', 'CASH': 'Cash at the box office'}.get(payment_method, payment_method) }}</span>
+        </span>
+        <a class="ms-auto small" href="{{ url_for('seat_select', show_id=show.show_id) }}">Change</a>
+      </div>
+      <input type="hidden" name="payment_method" value="{{ payment_method }}">
+      <button type="submit" class="btn btn-accent btn-lg w-100"
+              data-busy-text="Processing..." data-idle-text="Pay {{ rupees(total) }}">Pay {{ rupees(total) }}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - CineBook{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+    <p class="text-gray-600 mt-1">Welcome, {{ user.name }} (Admin)</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow p-6">
+        <div class="text-sm text-gray-500">Total Tickets Sold</div>
+        <div class="text-3xl font-bold text-indigo-600">{{ stats.total_tickets_sold }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <div class="text-sm text-gray-500">Total Revenue</div>
+        <div class="text-3xl font-bold text-green-600">₹{{ stats.total_revenue }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <div class="text-sm text-gray-500">Avg Ticket Price</div>
+        <div class="text-3xl font-bold text-blue-600">₹{{ stats.avg_ticket_price }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <div class="text-sm text-gray-500">Highest Price</div>
+        <div class="text-3xl font-bold text-purple-600">₹{{ stats.highest_ticket_price }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <div class="text-sm text-gray-500">Lowest Price</div>
+        <div class="text-3xl font-bold text-gray-600">₹{{ stats.lowest_ticket_price }}</div>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">Reports</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/reports/revenue-by-movie" class="p-4 border rounded-lg hover:bg-gray-50 transition">
+            <div class="font-medium">Revenue by Movie</div>
+            <div class="text-sm text-gray-500">Total revenue & tickets per movie</div>
+        </a>
+        <a href="/reports/occupancy" class="p-4 border rounded-lg hover:bg-gray-50 transition">
+            <div class="font-medium">Occupancy</div>
+            <div class="text-sm text-gray-500">Show occupancy percentages</div>
+        </a>
+        <a href="/reports/top-customers" class="p-4 border rounded-lg hover:bg-gray-50 transition">
+            <div class="font-medium">Top Customers</div>
+            <div class="text-sm text-gray-500">Biggest spenders</div>
+        </a>
+        <a href="/reports/daily-sales" class="p-4 border rounded-lg hover:bg-gray-50 transition">
+            <div class="font-medium">Daily Sales</div>
+            <div class="text-sm text-gray-500">Revenue & bookings per day</div>
+        </a>
+        <a href="/reports/unsold-movies" class="p-4 border rounded-lg hover:bg-gray-50 transition">
+            <div class="font-medium">Unsold Movies</div>
+            <div class="text-sm text-gray-500">Movies with no shows</div>
+        </a>
+        <a href="/reports/unbooked-customers" class="p-4 border rounded-lg hover:bg-gray-50 transition">
+            <div class="font-medium">Inactive Customers</div>
+            <div class="text-sm text-gray-500">Customers who never booked</div>
+        </a>
+        <a href="/reports/busiest-screens" class="p-4 border rounded-lg hover:bg-gray-50 transition">
+            <div class="font-medium">Busiest Screens</div>
+            <div class="text-sm text-gray-500">Theatres/screens by tickets sold</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

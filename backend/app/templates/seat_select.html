@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import rupees, hhmm, iso with context %}
+{% block title %}Choose seats{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('movie_detail', movie_id=show.movie_id) }}" class="small text-muted text-decoration-none">&larr; Other showtimes</a>
+<div class="mt-2 mb-4">
+  <h1 class="h3 mb-1">{{ show.movie_title }}</h1>
+  <div class="text-muted">
+    {{ show.theatre_name }}, {{ show.city }} &middot; {{ show.screen_name }} ({{ show.screen_type }})
+    &middot; <span data-date="{{ iso(show.show_date) }}" data-date-relative>{{ iso(show.show_date) }}</span>, {{ hhmm(show.start_time) }}
+  </div>
+</div>
+
+<form method="post" action="{{ url_for('book_seats', show_id=show.show_id) }}" id="seat-form">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="cb-card p-3 p-md-4">
+        <div class="seat-map-wrap">
+          <div class="seat-map">
+            <div class="screen">SCREEN</div>
+
+            {% set ns = namespace(category='') %}
+            {% for row_label, row_seats in rows.items() %}
+              {% if row_seats[0].seat_category != ns.category %}
+                {% set ns.category = row_seats[0].seat_category %}
+                <div class="seat-category-label">{{ ns.category|title }} &middot; {{ rupees(row_seats[0].price) }}</div>
+              {% endif %}
+              <div class="seat-row">
+                <span class="row-label">{{ row_label }}</span>
+                <div class="seats">
+                  {% for seat in row_seats %}
+                    {% set label = row_label ~ '-' ~ seat.seat_number %}
+                    {% set taken = seat.status|upper != 'AVAILABLE' %}
+                    <button type="button"
+                            class="seat seat-{{ seat.seat_category|lower }}{% if loop.index == row_seats|length // 2 %} aisle-after{% endif %}"
+                            data-seat-id="{{ seat.seat_id }}" data-label="{{ label }}" data-price="{{ seat.price }}"
+                            aria-label="{{ label }}, {{ seat.seat_category|title }}, {{ rupees(seat.price) }}{% if taken %}, taken{% endif %}"
+                            {% if taken %}disabled{% else %}aria-pressed="false"{% endif %}>{{ seat.seat_number }}</button>
+                  {% endfor %}
+                </div>
+                <span class="row-label">{{ row_label }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="legend mt-4 pt-3 border-top">
+          <span><span class="seat"></span> Available</span>
+          <span><span class="seat is-selected"></span> Selected</span>
+          <span><span class="seat is-taken"></span> Taken</span>
+          <span><span class="seat seat-regular"></span> Regular</span>
+          <span><span class="seat seat-premium"></span> Premium</span>
+          <span><span class="seat seat-recliner"></span> Recliner</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 seat-summary-col">
+      <div class="cb-card p-3 p-md-4 seat-summary">
+        <div class="d-flex justify-content-between align-items-baseline mb-2">
+          <h2 class="h5 mb-0">Your seats</h2>
+          <span class="small text-muted"><span id="selected-count">0</span> / 6</span>
+        </div>
+        <ul class="selected-list mb-3" id="selected-list" aria-live="polite"></ul>
+        <p class="small text-accent mb-2" id="limit-msg" hidden>You can book up to 6 seats at a time.</p>
+        <div class="d-flex justify-content-between fw-bold mb-3">
+          <span>Total</span><span id="selected-total">&#8377;0</span>
+        </div>
+
+        {# main.py takes the payment method here, on the seat page. #}
+        <fieldset class="mb-3">
+          <legend class="small text-muted mb-2">Pay with</legend>
+          <div class="pay-choice" role="radiogroup">
+            {% for value, label in [('UPI', 'UPI'), ('CARD', 'Card'), ('CASH', 'Cash')] %}
+              <input class="btn-check" type="radio" name="payment_method" id="pay-{{ value }}"
+                     value="{{ value }}" {% if loop.first %}checked{% endif %} required>
+              <label class="btn btn-sm btn-outline-accent" for="pay-{{ value }}">{{ label }}</label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <div id="seat-inputs"></div>
+        <button type="submit" class="btn btn-accent w-100" id="continue-btn" disabled>Continue</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/seats.js') }}"></script>
+{% endblock %}

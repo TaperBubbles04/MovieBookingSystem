@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}{{ report_type|replace('-', ' ')|title }} - Admin Reports - CineBook{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">{{ report_type|replace('-', ' ')|title }}</h1>
+        <p class="text-gray-600 mt-1">Admin Reports</p>
+    </div>
+    <a href="/admin" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+        ← Back to Dashboard
+    </a>
+</div>
+
+<!-- Filters -->
+{% if filters %}
+<div class="bg-white rounded-xl shadow p-4 mb-6">
+    <form method="GET" class="flex flex-wrap gap-4 items-end">
+        {% if filters.date_from is not none %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">From</label>
+            <input type="date" name="date_from" value="{{ filters.date_from }}" class="px-3 py-2 border rounded-lg">
+        </div>
+        {% endif %}
+        {% if filters.date_to is not none %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">To</label>
+            <input type="date" name="date_to" value="{{ filters.date_to }}" class="px-3 py-2 border rounded-lg">
+        </div>
+        {% endif %}
+        {% if filters.theatre_id is not none %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Theatre</label>
+            <select name="theatre_id" class="px-3 py-2 border rounded-lg">
+                <option value="">All Theatres</option>
+                {% for t in theatres %}
+                <option value="{{ t[0] }}" {% if t[0] == filters.theatre_id %}selected{% endif %}>{{ t[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        {% if filters.limit is not none %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Limit</label>
+            <input type="number" name="limit" value="{{ filters.limit }}" min="1" max="100" class="px-3 py-2 border rounded-lg w-24">
+        </div>
+        {% endif %}
+        {% if filters.days is not none %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Days</label>
+            <input type="number" name="days" value="{{ filters.days }}" min="1" max="365" class="px-3 py-2 border rounded-lg w-24">
+        </div>
+        {% endif %}
+        {% if filters.above_avg_only is not none %}
+        <div class="flex items-center">
+            <input type="checkbox" name="above_avg_only" value="true" {% if filters.above_avg_only %}checked{% endif %} class="mr-2">
+            <label class="text-sm">Above average only</label>
+        </div>
+        {% endif %}
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Apply</button>
+        <a href="{{ request.url.path }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Clear</a>
+    </form>
+</div>
+{% endif %}
+
+<!-- Report Table -->
+<div class="bg-white rounded-xl shadow overflow-hidden">
+    {% if report %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    {% if report_type == 'revenue-by-movie' %}
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Movie ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tickets</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avg Price</th>
+                    {% elif report_type == 'occupancy' %}
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Show ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Movie</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Theatre</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Screen</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booked</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Left</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Occupancy %</th>
+                    {% elif report_type == 'top-customers' %}
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bookings</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Spent</th>
+                    {% elif report_type == 'daily-sales' %}
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bookings</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                    {% elif report_type == 'unsold-movies' %}
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Movie ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Language</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Certificate</th>
+                    {% elif report_type == 'unbooked-customers' %}
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                    {% elif report_type == 'busiest-screens' %}
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Theatre</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">City</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Screen</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Shows</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tickets</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for r in report %}
+                <tr class="hover:bg-gray-50">
+                    {% if report_type == 'revenue-by-movie' %}
+                    <td class="px-4 py-3">{{ r.movie_id }}</td>
+                    <td class="px-4 py-3">{{ r.title }}</td>
+                    <td class="px-4 py-3 font-medium">₹{{ r.total_revenue }}</td>
+                    <td class="px-4 py-3">{{ r.tickets_sold }}</td>
+                    <td class="px-4 py-3">₹{{ r.avg_price }}</td>
+                    {% elif report_type == 'occupancy' %}
+                    <td class="px-4 py-3">{{ r.show_id }}</td>
+                    <td class="px-4 py-3">{{ r.movie }}</td>
+                    <td class="px-4 py-3">{{ r.theatre }}</td>
+                    <td class="px-4 py-3">{{ r.screen }}</td>
+                    <td class="px-4 py-3">{{ r.show_date }}</td>
+                    <td class="px-4 py-3">{{ r.start_time }}</td>
+                    <td class="px-4 py-3">{{ r.total_seats }}</td>
+                    <td class="px-4 py-3">{{ r.booked_seats }}</td>
+                    <td class="px-4 py-3">{{ r.seats_left }}</td>
+                    <td class="px-4 py-3 font-medium {% if r.occupancy_pct > 80 %}text-red-600{% elif r.occupancy_pct > 50 %}text-yellow-600{% else %}text-green-600{% endif %}">{{ r.occupancy_pct }}%</td>
+                    {% elif report_type == 'top-customers' %}
+                    <td class="px-4 py-3">{{ r.customer_id }}</td>
+                    <td class="px-4 py-3">{{ r.name }}</td>
+                    <td class="px-4 py-3">{{ r.email }}</td>
+                    <td class="px-4 py-3">{{ r.bookings_count }}</td>
+                    <td class="px-4 py-3 font-medium">₹{{ r.total_spent }}</td>
+                    {% elif report_type == 'daily-sales' %}
+                    <td class="px-4 py-3">{{ r.sale_date }}</td>
+                    <td class="px-4 py-3">{{ r.bookings }}</td>
+                    <td class="px-4 py-3 font-medium">₹{{ r.revenue }}</td>
+                    {% elif report_type == 'unsold-movies' %}
+                    <td class="px-4 py-3">{{ r.movie_id }}</td>
+                    <td class="px-4 py-3">{{ r.title }}</td>
+                    <td class="px-4 py-3">{{ r.language }}</td>
+                    <td class="px-4 py-3">{{ r.certificate }}</td>
+                    {% elif report_type == 'unbooked-customers' %}
+                    <td class="px-4 py-3">{{ r.customer_id }}</td>
+                    <td class="px-4 py-3">{{ r.name }}</td>
+                    <td class="px-4 py-3">{{ r.email }}</td>
+                    <td class="px-4 py-3">{{ r.phone }}</td>
+                    <td class="px-4 py-3">{{ r.created_at }}</td>
+                    {% elif report_type == 'busiest-screens' %}
+                    <td class="px-4 py-3">{{ r.theatre_name }}</td>
+                    <td class="px-4 py-3">{{ r.city }}</td>
+                    <td class="px-4 py-3">{{ r.screen_name }}</td>
+                    <td class="px-4 py-3">{{ r.screen_type }}</td>
+                    <td class="px-4 py-3">{{ r.total_shows }}</td>
+                    <td class="px-4 py-3">{{ r.tickets_sold }}</td>
+                    <td class="px-4 py-3 font-medium">₹{{ r.total_revenue }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="p-8 text-center text-gray-500">No data found</div>
+    {% endif %}
+</div>
+{% endblock %}

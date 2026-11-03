@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import rupees, status_badge, hhmm, iso, datetime_text with context %}
+{% block title %}Booking #{{ booking.booking_id }}{% endblock %}
+
+{% block content %}
+<div class="ticket">
+  <div class="ticket-head">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+      <span class="ticket-label">Booking #{{ booking.booking_id }}</span>
+      {{ status_badge(booking.status) }}
+    </div>
+    <h1 class="h3 fw-bold mb-1">{{ booking.movie_title }}</h1>
+    <div class="text-muted">{{ booking.theatre_name }}, {{ booking.city }}</div>
+    {% if booking.address %}<div class="small text-muted">{{ booking.address }}</div>{% endif %}
+  </div>
+
+  <div class="ticket-body pt-3">
+    <div class="row g-3">
+      <div class="col-4">
+        <div class="ticket-label">Date</div>
+        <div class="fw-semibold" data-date="{{ iso(booking.show_date) }}">{{ iso(booking.show_date) }}</div>
+      </div>
+      <div class="col-4">
+        <div class="ticket-label">Time</div>
+        <div class="fw-semibold">{{ hhmm(booking.start_time) }}</div>
+      </div>
+      <div class="col-4">
+        <div class="ticket-label">Screen</div>
+        <div class="fw-semibold">{{ booking.screen_name }}{% if booking.screen_type %} &middot; {{ booking.screen_type }}{% endif %}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticket-cut"></div>
+
+  <div class="ticket-body">
+    <div class="ticket-label mb-2">Seats</div>
+    <div class="mb-3">
+      {% for label in booking.seats %}
+        <span class="seat-chip">{{ label }}</span>
+      {% endfor %}
+    </div>
+
+    {# seats, seat_categories and prices are parallel lists from main.py. #}
+    <table class="table table-sm mb-3">
+      <tbody>
+        {% for label in booking.seats %}
+          <tr class="small">
+            <td>{{ label }}{% if booking.seat_categories[loop.index0] is defined %} &middot; {{ booking.seat_categories[loop.index0]|title }}{% endif %}</td>
+            <td class="text-end">{% if booking.prices[loop.index0] is defined %}{{ rupees(booking.prices[loop.index0]) }}{% endif %}</td>
+          </tr>
+        {% endfor %}
+        <tr class="fw-bold">
+          <td>Total</td>
+          <td class="text-end">{{ rupees(booking.total_amount) }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="row g-3 small">
+      <div class="col-6">
+        <div class="ticket-label">Payment</div>
+        {% if payment %}
+          <div>{{ payment.method }} {{ status_badge(payment.status) }}</div>
+        {% else %}
+          <div class="text-muted">Not recorded</div>
+        {% endif %}
+      </div>
+      <div class="col-6">
+        <div class="ticket-label">Booked at</div>
+        <div>{{ datetime_text(booking.booking_time) }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+  <a class="btn btn-accent" href="{{ url_for('my_bookings') }}">Go to My Bookings</a>
+  <a class="btn btn-outline-light" href="{{ url_for('movies_page') }}">Browse more movies</a>
+</div>
+{% endblock %}

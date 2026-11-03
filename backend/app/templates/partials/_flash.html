@@ -1,0 +1,13 @@
+{# Flash messages from main.py's flash() helper: a list of {message, category}.
+   "error" shows red, "success" green, "warning" yellow, anything else blue. #}
+{% if flashes %}
+  <div class="container mt-3">
+    {% for item in flashes %}
+      {% set kind = {'error': 'danger', 'danger': 'danger', 'success': 'success', 'warning': 'warning'}.get(item.category, 'info') %}
+      <div class="alert alert-{{ kind }} alert-dismissible fade show cb-alert" role="alert">
+        {{ item.message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Book movie tickets{% endblock %}
+
+{% block content %}
+<section class="hero text-center py-5">
+  <h1 class="display-5 fw-bold mb-3">Your next show is <span class="text-accent">a few taps away</span></h1>
+  <p class="lead text-muted hero-lead mx-auto mb-4">
+    Pick a movie, choose your seats and pay. No queues at the box office.
+  </p>
+  <form method="get" action="{{ url_for('movies_page') }}" class="d-flex gap-2 hero-search mx-auto mb-3" role="search">
+    <label for="hero-search" class="visually-hidden">Search movies</label>
+    <input type="search" class="form-control form-control-lg" id="hero-search" name="search" placeholder="Search for a movie">
+    <button type="submit" class="btn btn-accent btn-lg">Search</button>
+  </form>
+  <a href="{{ url_for('movies_page') }}">or browse everything showing &rarr;</a>
+</section>
+{% endblock %}

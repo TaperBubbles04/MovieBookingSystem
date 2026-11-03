@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import movie_card with context %}
+{% block title %}Movies{% endblock %}
+
+{% block content %}
+{# main.py does not pass a language list yet, so fall back to the languages of the
+   movies on this page (plus the current filter, so it stays selectable). #}
+{% if languages is defined %}
+  {% set language_options = languages %}
+{% else %}
+  {% set language_options = (movies|map(attribute='language')|list + ([filters.language] if filters.language else []))|unique|sort %}
+{% endif %}
+
+<div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-3">
+  <h1 class="h3 mb-0">Now showing</h1>
+  <span class="text-muted small">{{ movies|length }} movie{{ '' if movies|length == 1 else 's' }}</span>
+</div>
+
+<form method="get" action="{{ url_for('movies_page') }}" class="row g-2 mb-4" role="search">
+  <div class="col-12 col-lg-4">
+    <label for="search" class="visually-hidden">Search by title</label>
+    <input type="search" class="form-control" id="search" name="search"
+           value="{{ filters.search or '' }}" placeholder="Search by title">
+  </div>
+  <div class="col-6 col-md-3 col-lg-2">
+    <label for="genre" class="visually-hidden">Genre</label>
+    <select class="form-select" id="genre" name="genre">
+      <option value="">All genres</option>
+      {% for genre in genres %}
+        <option value="{{ genre }}" {% if genre == filters.genre %}selected{% endif %}>{{ genre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-6 col-md-3 col-lg-2">
+    <label for="language" class="visually-hidden">Language</label>
+    <select class="form-select" id="language" name="language">
+      <option value="">All languages</option>
+      {% for language in language_options %}
+        <option value="{{ language }}" {% if language == filters.language %}selected{% endif %}>{{ language }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-6 col-md-2 col-lg-1">
+    <label for="certificate" class="visually-hidden">Certificate</label>
+    <select class="form-select" id="certificate" name="certificate">
+      <option value="">Any cert.</option>
+      {% for cert in ['U', 'UA', 'A'] %}
+        <option value="{{ cert }}" {% if cert == filters.certificate %}selected{% endif %}>{{ cert }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-6 col-md-2 col-lg-1">
+    <label for="min_rating" class="visually-hidden">Minimum rating</label>
+    <select class="form-select" id="min_rating" name="min_rating">
+      <option value="0">Any &#9733;</option>
+      {% for r in [7, 8, 8.5] %}
+        <option value="{{ r }}" {% if filters.min_rating|float == r %}selected{% endif %}>{{ r }}+</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-md-2 col-lg-2 d-grid">
+    <button type="submit" class="btn btn-accent">Search</button>
+  </div>
+</form>
+
+{% if filters.search or filters.genre or filters.language or filters.certificate or filters.min_rating|float > 0 %}
+  <p class="small text-muted mb-3">
+    Showing filtered results. <a href="{{ url_for('movies_page') }}">Clear filters</a>
+  </p>
+{% endif %}
+
+{% if movies %}
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-4 g-3 g-md-4">
+    {% for movie in movies %}
+      <div class="col">{{ movie_card(movie) }}</div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p class="h5 mb-2">No movies match your search</p>
+    <p class="mb-3">Try a different title, genre or language.</p>
+    <a class="btn btn-outline-accent" href="{{ url_for('movies_page') }}">Show all movies</a>
+  </div>
+{% endif %}
+{% endblock %}

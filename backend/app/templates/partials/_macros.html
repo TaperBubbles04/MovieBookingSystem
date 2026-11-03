@@ -1,0 +1,50 @@
+{# Small pieces reused across pages. Import WITH context so url_for works:
+   {% from "partials/_macros.html" import rupees, hhmm with context %} #}
+
+{% macro rupees(amount) -%}
+  &#8377;{{ '{:,.0f}'.format(amount|float) }}
+{%- endmacro %}
+
+{# Database times and dates arrive as Python objects; these also accept strings. #}
+{% macro hhmm(value) -%}
+  {{ value.strftime('%H:%M') if value.strftime is defined else value }}
+{%- endmacro %}
+
+{% macro iso(value) -%}
+  {{ value.isoformat() if value.isoformat is defined else value }}
+{%- endmacro %}
+
+{% macro datetime_text(value) -%}
+  {{ value.strftime('%Y-%m-%d %H:%M') if value.strftime is defined else value }}
+{%- endmacro %}
+
+{% macro runtime(minutes) -%}
+  {{ minutes // 60 }}h {{ minutes % 60 }}m
+{%- endmacro %}
+
+{# Poster image over a gradient; the gradient shows if there is no image or it fails to load. #}
+{% macro poster(movie) %}
+  <div class="poster poster-g{{ movie.movie_id % 6 }}">
+    {% if movie.poster_url %}
+      <img class="poster-img" src="{{ movie.poster_url }}" alt="" loading="lazy">
+    {% endif %}
+    {% if movie.rating is not none %}<span class="poster-rating">&#9733; {{ movie.rating }}</span>{% endif %}
+    <span class="poster-cert">{{ movie.certificate }}</span>
+    <h3 class="poster-title">{{ movie.title }}</h3>
+  </div>
+{% endmacro %}
+
+{% macro movie_card(movie) %}
+  <a class="movie-card" href="{{ url_for('movie_detail', movie_id=movie.movie_id) }}">
+    {{ poster(movie) }}
+    <div class="movie-card-body">
+      <div class="small text-muted">{{ movie.language }} &middot; {{ runtime(movie.duration_min) }}</div>
+      <div class="small">{{ movie.genres|join(', ') }}</div>
+    </div>
+  </a>
+{% endmacro %}
+
+{# Coloured badge for CONFIRMED / CANCELLED / PENDING / SUCCESS / FAILED / REFUNDED. #}
+{% macro status_badge(status) -%}
+  <span class="badge badge-{{ status|lower }}">{{ status|title }}</span>
+{%- endmacro %}

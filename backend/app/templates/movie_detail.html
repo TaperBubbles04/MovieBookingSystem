@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import poster, runtime, hhmm, iso with context %}
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('movies_page') }}" class="small text-muted text-decoration-none">&larr; All movies</a>
+
+<div class="row g-4 mt-1 mb-5">
+  <div class="col-5 col-sm-4 col-md-3">{{ poster(movie) }}</div>
+  <div class="col-12 col-md-9">
+    <h1 class="h2 fw-bold mb-2">{{ movie.title }}</h1>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      {% for genre in movie.genres %}
+        <span class="badge rounded-pill genre-badge">{{ genre }}</span>
+      {% endfor %}
+    </div>
+    <ul class="list-inline text-muted mb-3">
+      {% if movie.rating is not none %}
+        <li class="list-inline-item"><span class="text-accent fw-bold">&#9733; {{ movie.rating }}/10</span></li>
+      {% endif %}
+      <li class="list-inline-item">&middot; {{ movie.certificate }}</li>
+      <li class="list-inline-item">&middot; {{ movie.language }}</li>
+      <li class="list-inline-item">&middot; {{ runtime(movie.duration_min) }}</li>
+      <li class="list-inline-item">&middot; Released <span data-date="{{ iso(movie.release_date) }}">{{ iso(movie.release_date) }}</span></li>
+    </ul>
+    <p class="mb-0 movie-description">{{ movie.description }}</p>
+  </div>
+</div>
+
+<h2 class="h4 mb-3">Showtimes</h2>
+{% if shows %}
+  {% set days = shows|groupby('show_date') %}
+  <ul class="nav nav-pills date-tabs mb-3" role="tablist">
+    {% for show_date, _ in days %}
+      {% set day = iso(show_date) %}
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ day }}"
+                data-bs-toggle="pill" data-bs-target="#day-{{ day }}" type="button" role="tab"
+                aria-controls="day-{{ day }}" aria-selected="{{ 'true' if loop.first else 'false' }}">
+          <span data-date="{{ day }}" data-date-relative>{{ day }}</span>
+        </button>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="tab-content">
+    {% for show_date, day_shows in days %}
+      {% set day = iso(show_date) %}
+      <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="day-{{ day }}"
+           role="tabpanel" aria-labelledby="tab-{{ day }}">
+        {% for theatre_name, theatre_shows in day_shows|groupby('theatre_name') %}
+          <div class="cb-card p-3 mb-3">
+            <div class="fw-semibold">{{ theatre_name }}</div>
+            <div class="small text-muted mb-3">{{ theatre_shows[0].city }}</div>
+            <div class="d-flex flex-wrap gap-2">
+              {% for s in theatre_shows|sort(attribute='start_time') %}
+                {# seats_left is shown once main.py sends it. #}
+                {% set full = s.seats_left is defined and s.seats_left == 0 %}
+                {% set low = s.seats_left is defined and 0 < s.seats_left <= 15 %}
+                <a class="show-btn {% if full %}is-full{% elif low %}is-low{% endif %}"
+                   href="{{ url_for('seat_select', show_id=s.show_id) }}"
+                   {% if full %}aria-disabled="true" tabindex="-1"{% endif %}>
+                  <span class="show-time">{{ hhmm(s.start_time) }}</span>
+                  <span class="show-meta">{{ s.screen_type }} &middot; {{ s.screen_name }}</span>
+                  {% if s.seats_left is defined %}
+                    <span class="show-meta show-seats">{% if full %}Sold out{% else %}{{ s.seats_left }} seats left{% endif %}</span>
+                  {% else %}
+                    <span class="show-meta">Ends {{ hhmm(s.end_time) }}</span>
+                  {% endif %}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">No shows are scheduled for this movie yet. Please check back soon.</div>
+{% endif %}
+{% endblock %}
