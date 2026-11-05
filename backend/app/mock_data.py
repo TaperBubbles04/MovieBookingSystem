@@ -133,6 +133,17 @@ def get_movies(search="", genre="", language="", certificate="", min_rating=0):
     return sorted(result, key=lambda m: m["title"])
 
 
+def get_languages():
+    return sorted({m["language"] for m in MOVIES})
+
+
+def get_featured_movies():
+    released = [m for m in MOVIES if m["release_date"] <= date.today()]
+    return [{"movie_id": m["movie_id"], "title": m["title"], "poster_url": m["poster_url"],
+             "rating": m["rating"]}
+            for m in sorted(released, key=lambda m: m["rating"], reverse=True)[:8]]
+
+
 def get_movie(movie_id):
     return next((m for m in MOVIES if m["movie_id"] == movie_id), None)
 
@@ -143,11 +154,14 @@ def get_movie_shows(movie_id):
         if s["movie_id"] != movie_id:
             continue
         theatre_id, screen_name, screen_type, *_ = SCREENS[s["screen_id"]]
+        total_seats = sum(1 for seat in SEATS.values() if seat["screen_id"] == s["screen_id"])
         result.append({"show_id": s["show_id"], "show_date": s["show_date"],
                        "start_time": s["start_time"], "end_time": s["end_time"],
                        "theatre_name": THEATRES[theatre_id]["name"],
                        "city": THEATRES[theatre_id]["city"],
-                       "screen_name": screen_name, "screen_type": screen_type})
+                       "screen_name": screen_name, "screen_type": screen_type,
+                       "seats_left": total_seats - len(TAKEN[s["show_id"]]),
+                       "total_seats": total_seats})
     return result
 
 
@@ -236,6 +250,7 @@ def get_my_bookings(customer_id):
         if b["customer_id"] != customer_id:
             continue
         s, movie, theatre, screen_name, _ = _show_info(b["show_id"])
+        show_dt = datetime.combine(s["show_date"], s["start_time"])
         result.append({
             "booking_id": b["booking_id"], "booking_time": b["booking_time"],
             "total_amount": b["total_amount"], "status": b["status"], "show_id": b["show_id"],
@@ -244,6 +259,7 @@ def get_my_bookings(customer_id):
             "theatre_name": theatre["name"], "screen_name": screen_name,
             "seats": [_label(i) for i in b["seat_ids"]],
             "payment_status": b["payment"]["status"],
+            "can_cancel": b["status"] == "CONFIRMED" and show_dt > datetime.now() + timedelta(hours=2),
         })
     return result
 

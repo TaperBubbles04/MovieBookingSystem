@@ -1,5 +1,7 @@
 """Stand-alone preview server for the customer templates. Development only.
 
+Covers the customer pages only; the /admin and /reports routes need the real app.
+
 Run from the backend folder:   python app/preview.py
 Then open http://127.0.0.1:8001
 
@@ -54,7 +56,8 @@ def login_redirect(request: Request, message: str):
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     user = await get_current_user(request)
-    return templates.TemplateResponse(request, "index.html", {"user": user})
+    return templates.TemplateResponse(request, "index.html", {
+        "user": user, "genres": sorted(mock_data.GENRES), "featured_movies": mock_data.get_featured_movies()})
 
 
 @app.get("/movies", response_class=HTMLResponse)
@@ -65,6 +68,7 @@ async def movies_page(request: Request, search: str = "", genre: str = "", langu
         "user": user,
         "movies": mock_data.get_movies(search, genre, language, certificate, min_rating),
         "genres": sorted(mock_data.GENRES),
+        "languages": mock_data.get_languages(),
         "filters": {"search": search, "genre": genre, "language": language,
                     "certificate": certificate, "min_rating": min_rating},
     })
@@ -95,10 +99,13 @@ async def seat_select(request: Request, show_id: int):
 
 @app.post("/shows/{show_id}/book", response_class=HTMLResponse)
 async def book_seats(request: Request, show_id: int, seat_ids: list[int] = Form(...),
-                     payment_method: str = Form(...)):
+                     payment_method: str = Form("UPI")):
     user = await get_current_user(request)
     if not user:
         return login_redirect(request, "Please login to book tickets")
+    if len(seat_ids) > 6:
+        flash(request, "Maximum 6 seats per booking", "error")
+        return RedirectResponse(url=f"/shows/{show_id}/seats", status_code=status.HTTP_303_SEE_OTHER)
     request.session["selected_seats"] = seat_ids
     request.session["show_id"] = show_id
     request.session["payment_method"] = payment_method
@@ -122,17 +129,20 @@ async def checkout_page(request: Request):
 
 
 @app.post("/book", response_class=HTMLResponse)
-async def process_booking(request: Request):
+async def process_booking(request: Request, payment_method: str = Form(None)):
     user = await get_current_user(request)
     if not user:
         flash(request, "Session expired, please login again", "error")
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     seat_ids = request.session.get("selected_seats", [])
     show_id = request.session.get("show_id")
-    payment_method = request.session.get("payment_method", "UPI")
+    payment_method = payment_method or request.session.get("payment_method", "UPI")
     if not seat_ids or not show_id:
         flash(request, "Invalid booking session", "error")
         return RedirectResponse(url="/movies", status_code=status.HTTP_303_SEE_OTHER)
+    if len(seat_ids) > 6:
+        flash(request, "Maximum 6 seats per booking", "error")
+        return RedirectResponse(url=f"/shows/{show_id}/seats", status_code=status.HTTP_303_SEE_OTHER)
     try:
         result = mock_data.create_booking(user["customer_id"], show_id, seat_ids, payment_method)
     except ValueError as e:
@@ -226,7 +236,7 @@ async def logout(request: Request):
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
-# ---- Not in main.py yet: the 404/500 handlers I've asked Tharanesh to add ----
+# ---- Error pages. /preview/error exists only here, to look at error.html ----
 
 @app.get("/preview/error")
 async def preview_error():
