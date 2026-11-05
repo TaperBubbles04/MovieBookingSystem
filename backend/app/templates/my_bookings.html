@@ -8,9 +8,6 @@
 {% if bookings %}
   <div class="d-flex flex-column gap-3">
     {% for b in bookings %}
-      {# Until main.py sends can_cancel, offer Cancel on every confirmed booking;
-         the server still refuses shows less than 2 hours away. #}
-      {% set can_cancel = b.can_cancel if b.can_cancel is defined else b.status == 'CONFIRMED' %}
       <div class="cb-card booking-card p-3 p-md-4 {% if b.status == 'CANCELLED' %}is-cancelled{% endif %}">
         <div class="row g-3 align-items-center">
           <div class="col-md-8">
@@ -29,13 +26,13 @@
             </div>
             {% if b.status == 'CANCELLED' and b.payment_status == 'REFUNDED' %}
               <div class="small text-accent mt-2">{{ rupees(b.total_amount) }} has been refunded to your original payment method.</div>
-            {% elif b.status == 'CONFIRMED' and not can_cancel %}
+            {% elif b.status == 'CONFIRMED' and not b.can_cancel %}
               <div class="small text-muted mt-2">This booking can no longer be cancelled.</div>
             {% endif %}
           </div>
           <div class="col-md-4 d-flex flex-wrap justify-content-md-end gap-2">
             <a class="btn btn-sm btn-outline-light" href="{{ url_for('confirmation', booking_id=b.booking_id) }}">View ticket</a>
-            {% if can_cancel %}
+            {% if b.can_cancel %}
               <form method="post" action="{{ url_for('cancel_booking', booking_id=b.booking_id) }}"
                     data-confirm="Cancel booking #{{ b.booking_id }} for {{ b.movie_title }}? This cannot be undone."
                     data-single-submit>
