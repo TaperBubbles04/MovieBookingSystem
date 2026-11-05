@@ -327,8 +327,6 @@ body {
   }
   .seat-summary .selected-list { max-height: 4.5rem; overflow-y: auto; }
 }
-.pay-choice { display: flex; gap: 0.4rem; }
-.pay-choice .btn { flex: 1; }
 .selected-list { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; }
 
 /* ---------- Checkout ---------- */

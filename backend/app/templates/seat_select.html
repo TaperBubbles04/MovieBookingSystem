@@ -68,18 +68,6 @@
           <span>Total</span><span id="selected-total">&#8377;0</span>
         </div>
 
-        {# main.py takes the payment method here, on the seat page. #}
-        <fieldset class="mb-3">
-          <legend class="small text-muted mb-2">Pay with</legend>
-          <div class="pay-choice" role="radiogroup">
-            {% for value, label in [('UPI', 'UPI'), ('CARD', 'Card'), ('CASH', 'Cash')] %}
-              <input class="btn-check" type="radio" name="payment_method" id="pay-{{ value }}"
-                     value="{{ value }}" {% if loop.first %}checked{% endif %} required>
-              <label class="btn btn-sm btn-outline-accent" for="pay-{{ value }}">{{ label }}</label>
-            {% endfor %}
-          </div>
-        </fieldset>
-
         <div id="seat-inputs"></div>
         <button type="submit" class="btn btn-accent w-100" id="continue-btn" disabled>Continue</button>
       </div>

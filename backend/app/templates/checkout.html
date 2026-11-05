@@ -39,19 +39,24 @@
   </div>
 
   <div class="col-lg-5">
-    {# main.py's /book reads seats and payment method from the session, so this form
-       only confirms. payment_method is also posted in case /book starts reading it. #}
+    {# main.py's /book keeps the seats in the session and reads payment_method from this form. #}
     <form method="post" action="{{ url_for('process_booking') }}" class="cb-card p-4" data-single-submit>
-      <h2 class="h5 mb-3">Payment</h2>
-      <div class="pay-option mb-3">
-        <span>
-          <span class="d-block small text-muted">Paying with</span>
-          <span class="fw-semibold">{{ {'UPI': 'UPI', 'CARD': 'Card', 'CASH': 'Cash at the box office'}.get(payment_method, payment_method) }}</span>
-        </span>
-        <a class="ms-auto small" href="{{ url_for('seat_select', show_id=show.show_id) }}">Change</a>
-      </div>
-      <input type="hidden" name="payment_method" value="{{ payment_method }}">
-      <button type="submit" class="btn btn-accent btn-lg w-100"
+      <fieldset>
+        <legend class="h5 mb-3">Payment method</legend>
+        {% for value, label, hint in [('UPI', 'UPI', 'Google Pay, PhonePe, Paytm'),
+                                       ('CARD', 'Card', 'Debit or credit card'),
+                                       ('CASH', 'Cash', 'Pay at the box office')] %}
+          <label class="pay-option mb-2" for="pay-{{ value }}">
+            <input class="form-check-input mt-0" type="radio" name="payment_method" id="pay-{{ value }}"
+                   value="{{ value }}" {% if value == payment_method %}checked{% endif %} required>
+            <span>
+              <span class="d-block fw-semibold">{{ label }}</span>
+              <span class="small text-muted">{{ hint }}</span>
+            </span>
+          </label>
+        {% endfor %}
+      </fieldset>
+      <button type="submit" class="btn btn-accent btn-lg w-100 mt-3"
               data-busy-text="Processing..." data-idle-text="Pay {{ rupees(total) }}">Pay {{ rupees(total) }}</button>
     </form>
   </div>
