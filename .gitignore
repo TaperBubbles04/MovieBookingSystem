@@ -1,15 +1,24 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Virtual environments
+.venv/
 venv/
+env/
+ENV/
+
+# Environment variables
 .env
-*.egg-info/
+.env.local
+.env.*.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
+*.swo
 
 # OS
 .DS_Store
@@ -17,7 +26,33 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
 
 # Database
 *.sqlite
 *.db
+
+# Test coverage
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+
+# Node modules (if any frontend)
+node_modules/
+
+# Static files (generated)
+app/static/css/*.min.css
+app/static/js/*.min.js
+
+# Cache
+.cache/

@@ -4,6 +4,7 @@
 -- Target: PostgreSQL 16
 -- Purpose: Rebuilds and populates all 12 tables from scratch in one step with
 --          realistic Indian multiplex data (Chennai & Bengaluru).
+--          All dates are relative to CURRENT_DATE for perennial freshness.
 -- ============================================================================
 
 BEGIN;
@@ -153,28 +154,32 @@ INSERT INTO Genre (genre_name) VALUES
 
 -- ----------------------------------------------------------------------------
 -- 3. Movie (10 rows: Tamil, Hindi, English, Telugu; Movie #10 has NO shows)
+--    Release dates are relative to CURRENT_DATE for perennial freshness.
 -- ----------------------------------------------------------------------------
+-- Movies 1-9: released 10-80 days ago (already in theaters)
+-- Movie 10: releases in 8 days (future, no shows yet)
 INSERT INTO Movie (title, description, duration_min, language, certificate, release_date, rating, poster_url) VALUES
-    -- 1
-    ('Leo', 'A mild-mannered cafe owner in Kashmir becomes a local hero, drawing the attention of a ruthless drug cartel claiming he is their former cohort.', 164, 'Tamil', 'UA', '2026-10-16', 8.1, 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600'),
-    -- 2
-    ('Vikram', 'A special investigator discovers a case of serial killings is not what it seems to be, leading to a high-stakes war between rival vigilanteand syndicate factions.', 174, 'Tamil', 'UA', '2026-09-25', 8.6, 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600'),
-    -- 3
-    ('Jawan', 'A prison warden recruits inmates to commit high-profile heists that expose corruption and bring justice to everyday citizens.', 169, 'Hindi', 'UA', '2026-10-02', 7.8, 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600'),
-    -- 4
-    ('Stree 2', 'The town of Chanderi faces a new supernatural terror in the form of Sarkata, forcing Vicky and his friends to reunite for a rescue mission.', 147, 'Hindi', 'UA', '2026-10-10', 8.2, 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600'),
-    -- 5
-    ('Oppenheimer', 'The story of theoretical physicist J. Robert Oppenheimer and his role in designing the atomic bomb during World War II.', 180, 'English', 'A', '2026-08-15', 8.9, 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=600'),
-    -- 6
-    ('Dune: Part Two', 'Paul Atreides unites with Chani and the Fremen while on a warpath of revenge against the conspirators who destroyed his family.', 166, 'English', 'UA', '2026-09-12', 8.8, 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600'),
-    -- 7
-    ('Kalki 2898 AD', 'In a post-apocalyptic desert city, a bounty hunter and an immortal warrior cross paths to protect a prophesied child.', 181, 'Telugu', 'UA', '2026-10-09', 8.0, 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600'),
-    -- 8
-    ('Hi Nanna', 'A doting single father begins to narrate the story of his missing wife to his six-year-old daughter with cystic fibrosis.', 155, 'Telugu', 'U', '2026-09-20', 8.3, 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600'),
-    -- 9
-    ('Spider-Man: Across the Spider-Verse', 'Miles Morales catapults across the Multiverse, where he encounters a team of Spider-People charged with protecting its very existence.', 140, 'English', 'U', '2026-08-28', 8.7, 'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=600'),
+    -- 1: Leo - released 21 days ago
+    ('Leo', 'A mild-mannered cafe owner in Kashmir becomes a local hero, drawing the attention of a ruthless drug cartel claiming he is their former cohort.', 164, 'Tamil', 'UA', CURRENT_DATE - INTERVAL '21 days', 8.1, 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600'),
+    -- 2: Vikram - released 42 days ago
+    ('Vikram', 'A special investigator discovers a case of serial killings is not what it seems to be, leading to a high-stakes war between rival vigilanteand syndicate factions.', 174, 'Tamil', 'UA', CURRENT_DATE - INTERVAL '42 days', 8.6, 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600'),
+    -- 3: Jawan - released 35 days ago
+    ('Jawan', 'A prison warden recruits inmates to commit high-profile heists that expose corruption and bring justice to everyday citizens.', 169, 'Hindi', 'UA', CURRENT_DATE - INTERVAL '35 days', 7.8, 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600'),
+    -- 4: Stree 2 - released 27 days ago
+    ('Stree 2', 'The town of Chanderi faces a new supernatural terror in the form of Sarkata, forcing Vicky and his friends to reunite for a rescue mission.', 147, 'Hindi', 'UA', CURRENT_DATE - INTERVAL '27 days', 8.2, 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600'),
+    -- 5: Oppenheimer - released 83 days ago
+    ('Oppenheimer', 'The story of theoretical physicist J. Robert Oppenheimer and his role in designing the atomic bomb during World War II.', 180, 'English', 'A', CURRENT_DATE - INTERVAL '83 days', 8.9, 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=600'),
+    -- 6: Dune: Part Two - released 55 days ago
+    ('Dune: Part Two', 'Paul Atreides unites with Chani and the Fremen while on a warpath of revenge against the conspirators who destroyed his family.', 166, 'English', 'UA', CURRENT_DATE - INTERVAL '55 days', 8.8, 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600'),
+    -- 7: Kalki 2898 AD - released 28 days ago
+    ('Kalki 2898 AD', 'In a post-apocalyptic desert city, a bounty hunter and an immortal warrior cross paths to protect a prophesied child.', 181, 'Telugu', 'UA', CURRENT_DATE - INTERVAL '28 days', 8.0, 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600'),
+    -- 8: Hi Nanna - released 47 days ago
+    ('Hi Nanna', 'A doting single father begins to narrate the story of his missing wife to his six-year-old daughter with cystic fibrosis.', 155, 'Telugu', 'U', CURRENT_DATE - INTERVAL '47 days', 8.3, 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600'),
+    -- 9: Spider-Man: Across the Spider-Verse - released 70 days ago
+    ('Spider-Man: Across the Spider-Verse', 'Miles Morales catapults across the Multiverse, where he encounters a team of Spider-People charged with protecting its very existence.', 140, 'English', 'U', CURRENT_DATE - INTERVAL '70 days', 8.7, 'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=600'),
     -- 10 (Intentionally has NO scheduled shows — powers Query #7 LEFT JOIN, Query #9 Unsold Movies subquery, and DELETE test)
-    ('Kanguva', 'A tribal warrior fierce struggle to save his people a millennium ago is mysteriously linked to a shadow cop in the present.', 154, 'Tamil', 'UA', '2026-11-14', 7.5, 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600');
+    -- Releases in 8 days
+    ('Kanguva', 'A tribal warrior fierce struggle to save his people a millennium ago is mysteriously linked to a shadow cop in the present.', 154, 'Tamil', 'UA', CURRENT_DATE + INTERVAL '8 days', 7.5, 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600');
 
 -- ----------------------------------------------------------------------------
 -- 4. Movie_Genre (22 mappings resolving M:N)
@@ -289,77 +294,79 @@ CROSS JOIN generate_series(1, 10) AS s(seat_no)
 ORDER BY r.ord, s.seat_no;
 
 -- ----------------------------------------------------------------------------
--- 8. Show (32 shows across 7 days: 2026-10-27 to 2026-11-02; zero overlaps)
+-- 8. Show (32 shows across 7 days: CURRENT_DATE-3 to CURRENT_DATE+3; zero overlaps)
 --    Movies 1..9 are scheduled; Movie 10 ('Kanguva') has 0 shows.
+--    Weekend days are CURRENT_DATE+1 and CURRENT_DATE+2 (for weekend pricing demo)
 -- ----------------------------------------------------------------------------
 INSERT INTO Show (movie_id, screen_id, show_date, start_time, end_time) VALUES
-    -- Day 1: Tuesday 2026-10-27 (Past — for 7-day sales & reports)
-    (1, 1, '2026-10-27', '10:00', '13:00'), -- show_id = 1  (Leo, Chennai IMAX)
-    (5, 1, '2026-10-27', '18:30', '21:45'), -- show_id = 2  (Oppenheimer, Chennai IMAX)
-    (3, 2, '2026-10-27', '14:00', '17:00'), -- show_id = 3  (Jawan, Chennai 3D)
-    (6, 4, '2026-10-27', '19:00', '22:00'), -- show_id = 4  (Dune 2, Bengaluru IMAX)
+    -- Day 1: CURRENT_DATE - 3 days (Past — for 7-day sales & reports)
+    (1, 1, CURRENT_DATE - INTERVAL '3 days', '10:00', '13:00'), -- show_id = 1  (Leo, Chennai IMAX)
+    (5, 1, CURRENT_DATE - INTERVAL '3 days', '18:30', '21:45'), -- show_id = 2  (Oppenheimer, Chennai IMAX)
+    (3, 2, CURRENT_DATE - INTERVAL '3 days', '14:00', '17:00'), -- show_id = 3  (Jawan, Chennai 3D)
+    (6, 4, CURRENT_DATE - INTERVAL '3 days', '19:00', '22:00'), -- show_id = 4  (Dune 2, Bengaluru IMAX)
 
-    -- Day 2: Wednesday 2026-10-28 (Past)
-    (2, 1, '2026-10-28', '10:30', '13:30'), -- show_id = 5  (Vikram, Chennai IMAX)
-    (7, 2, '2026-10-28', '18:00', '21:15'), -- show_id = 6  (Kalki 2898 AD, Chennai 3D)
-    (8, 3, '2026-10-28', '15:00', '17:45'), -- show_id = 7  (Hi Nanna, Chennai 2D)
-    (4, 5, '2026-10-28', '19:30', '22:15'), -- show_id = 8  (Stree 2, Bengaluru 2D)
+    -- Day 2: CURRENT_DATE - 2 days (Past)
+    (2, 1, CURRENT_DATE - INTERVAL '2 days', '10:30', '13:30'), -- show_id = 5  (Vikram, Chennai IMAX)
+    (7, 2, CURRENT_DATE - INTERVAL '2 days', '18:00', '21:15'), -- show_id = 6  (Kalki 2898 AD, Chennai 3D)
+    (8, 3, CURRENT_DATE - INTERVAL '2 days', '15:00', '17:45'), -- show_id = 7  (Hi Nanna, Chennai 2D)
+    (4, 5, CURRENT_DATE - INTERVAL '2 days', '19:30', '22:15'), -- show_id = 8  (Stree 2, Bengaluru 2D)
 
-    -- Day 3: Thursday 2026-10-29 (Past)
-    (1, 1, '2026-10-29', '14:00', '17:00'), -- show_id = 9  (Leo, Chennai IMAX)
-    (9, 2, '2026-10-29', '11:00', '13:30'), -- show_id = 10 (Spider-Verse, Chennai 3D)
-    (5, 4, '2026-10-29', '18:30', '21:45'), -- show_id = 11 (Oppenheimer, Bengaluru IMAX)
-    (3, 5, '2026-10-29', '15:30', '18:30'), -- show_id = 12 (Jawan, Bengaluru 2D)
+    -- Day 3: CURRENT_DATE - 1 day (Past)
+    (1, 1, CURRENT_DATE - INTERVAL '1 day', '14:00', '17:00'),  -- show_id = 9  (Leo, Chennai IMAX)
+    (9, 2, CURRENT_DATE - INTERVAL '1 day', '11:00', '13:30'),  -- show_id = 10 (Spider-Verse, Chennai 3D)
+    (5, 4, CURRENT_DATE - INTERVAL '1 day', '18:30', '21:45'),  -- show_id = 11 (Oppenheimer, Bengaluru IMAX)
+    (3, 5, CURRENT_DATE - INTERVAL '1 day', '15:30', '18:30'),  -- show_id = 12 (Jawan, Bengaluru 2D)
 
-    -- Day 4: Friday 2026-10-30 (Past/Recent)
-    (1, 1, '2026-10-30', '10:00', '13:00'), -- show_id = 13 (Leo, Chennai IMAX)
-    (6, 1, '2026-10-30', '18:30', '21:30'), -- show_id = 14 (Dune 2, Chennai IMAX)
-    (2, 3, '2026-10-30', '14:30', '17:30'), -- show_id = 15 (Vikram, Chennai 2D)
-    (7, 4, '2026-10-30', '19:00', '22:15'), -- show_id = 16 (Kalki 2898 AD, Bengaluru IMAX)
-    (4, 5, '2026-10-30', '16:00', '18:45'), -- show_id = 17 (Stree 2, Bengaluru 2D)
+    -- Day 4: CURRENT_DATE (Today/Past/Recent)
+    (1, 1, CURRENT_DATE, '10:00', '13:00'),  -- show_id = 13 (Leo, Chennai IMAX)
+    (6, 1, CURRENT_DATE, '18:30', '21:30'),  -- show_id = 14 (Dune 2, Chennai IMAX)
+    (2, 3, CURRENT_DATE, '14:30', '17:30'),  -- show_id = 15 (Vikram, Chennai 2D)
+    (7, 4, CURRENT_DATE, '19:00', '22:15'),  -- show_id = 16 (Kalki 2898 AD, Bengaluru IMAX)
+    (4, 5, CURRENT_DATE, '16:00', '18:45'),  -- show_id = 17 (Stree 2, Bengaluru 2D)
 
-    -- Day 5: Saturday 2026-10-31 (Weekend — Higher Pricing)
-    (1, 1, '2026-10-31', '10:00', '13:00'), -- show_id = 18 (Leo, Chennai IMAX)
-    (5, 1, '2026-10-31', '14:30', '17:45'), -- show_id = 19 (Oppenheimer, Chennai IMAX)
-    (7, 2, '2026-10-31', '18:30', '21:45'), -- show_id = 20 (Kalki 2898 AD, Chennai 3D)
-    (8, 3, '2026-10-31', '11:30', '14:15'), -- show_id = 21 (Hi Nanna, Chennai 2D)
-    (6, 4, '2026-10-31', '18:00', '21:00'), -- show_id = 22 (Dune 2, Bengaluru IMAX)
-    (9, 5, '2026-10-31', '15:00', '17:30'), -- show_id = 23 (Spider-Verse, Bengaluru 2D)
+    -- Day 5: CURRENT_DATE + 1 day (Weekend — Higher Pricing)
+    (1, 1, CURRENT_DATE + INTERVAL '1 day', '10:00', '13:00'),  -- show_id = 18 (Leo, Chennai IMAX)
+    (5, 1, CURRENT_DATE + INTERVAL '1 day', '14:30', '17:45'),  -- show_id = 19 (Oppenheimer, Chennai IMAX)
+    (7, 2, CURRENT_DATE + INTERVAL '1 day', '18:30', '21:45'),  -- show_id = 20 (Kalki 2898 AD, Chennai 3D)
+    (8, 3, CURRENT_DATE + INTERVAL '1 day', '11:30', '14:15'),  -- show_id = 21 (Hi Nanna, Chennai 2D)
+    (6, 4, CURRENT_DATE + INTERVAL '1 day', '18:00', '21:00'),  -- show_id = 22 (Dune 2, Bengaluru IMAX)
+    (9, 5, CURRENT_DATE + INTERVAL '1 day', '15:00', '17:30'),  -- show_id = 23 (Spider-Verse, Bengaluru 2D)
 
-    -- Day 6: Sunday 2026-11-01 (Weekend — Higher Pricing & Live Demo Target)
-    (1, 1, '2026-11-01', '10:00', '13:00'), -- show_id = 24 (Leo, Chennai IMAX)
-    (6, 1, '2026-11-01', '19:30', '22:30'), -- show_id = 25 (Dune 2, Chennai IMAX)
-    (9, 2, '2026-11-01', '14:00', '16:30'), -- show_id = 26 (Spider-Verse, Chennai 3D)
-    (4, 3, '2026-11-01', '18:30', '21:15'), -- show_id = 27 (Stree 2, Chennai 2D)
-    (7, 4, '2026-11-01', '15:00', '18:15'), -- show_id = 28 (Kalki 2898 AD, Bengaluru IMAX)
-    (3, 5, '2026-11-01', '19:00', '22:00'), -- show_id = 29 (Jawan, Bengaluru 2D)
+    -- Day 6: CURRENT_DATE + 2 days (Weekend — Higher Pricing & Live Demo Target)
+    (1, 1, CURRENT_DATE + INTERVAL '2 days', '10:00', '13:00'),  -- show_id = 24 (Leo, Chennai IMAX)
+    (6, 1, CURRENT_DATE + INTERVAL '2 days', '19:30', '22:30'),  -- show_id = 25 (Dune 2, Chennai IMAX)
+    (9, 2, CURRENT_DATE + INTERVAL '2 days', '14:00', '16:30'),  -- show_id = 26 (Spider-Verse, Chennai 3D)
+    (4, 3, CURRENT_DATE + INTERVAL '2 days', '18:30', '21:15'),  -- show_id = 27 (Stree 2, Chennai 2D)
+    (7, 4, CURRENT_DATE + INTERVAL '2 days', '15:00', '18:15'),  -- show_id = 28 (Kalki 2898 AD, Bengaluru IMAX)
+    (3, 5, CURRENT_DATE + INTERVAL '2 days', '19:00', '22:00'),  -- show_id = 29 (Jawan, Bengaluru 2D)
 
-    -- Day 7: Monday 2026-11-02 (Upcoming Weekday)
-    (2, 1, '2026-11-02', '18:00', '21:00'), -- show_id = 30 (Vikram, Chennai IMAX)
-    (8, 3, '2026-11-02', '14:00', '16:45'), -- show_id = 31 (Hi Nanna, Chennai 2D)
-    (5, 4, '2026-11-02', '19:00', '22:15'); -- show_id = 32 (Oppenheimer, Bengaluru IMAX)
+    -- Day 7: CURRENT_DATE + 3 days (Upcoming Weekday)
+    (2, 1, CURRENT_DATE + INTERVAL '3 days', '18:00', '21:00'),  -- show_id = 30 (Vikram, Chennai IMAX)
+    (8, 3, CURRENT_DATE + INTERVAL '3 days', '14:00', '16:45'),  -- show_id = 31 (Hi Nanna, Chennai 2D)
+    (5, 4, CURRENT_DATE + INTERVAL '3 days', '19:00', '22:15');  -- show_id = 32 (Oppenheimer, Bengaluru IMAX)
 
 -- ----------------------------------------------------------------------------
 -- 9. Show_Pricing (3 tiers per show = 96 rows; weekend & IMAX/3D priced higher)
+--    Weekend days: CURRENT_DATE+1 and CURRENT_DATE+2
 --    - Weekday 2D (Screens 3, 5):         REGULAR 150, PREMIUM 220, RECLINER 350
 --    - Weekday 3D (Screen 2):             REGULAR 180, PREMIUM 260, RECLINER 400
 --    - Weekday IMAX (Screens 1, 4):       REGULAR 220, PREMIUM 320, RECLINER 480
---    - Weekend (Oct 31, Nov 01) +₹30/+₹40/+₹50 surcharge per tier
+--    - Weekend (CURRENT_DATE+1, CURRENT_DATE+2) +₹30/+₹40/+₹50 surcharge per tier
 -- ----------------------------------------------------------------------------
 INSERT INTO Show_Pricing (show_id, seat_category, price)
 SELECT
     sh.show_id,
     cat.seat_category,
     CASE
-        WHEN sc.screen_type = 'IMAX' AND sh.show_date IN ('2026-10-31', '2026-11-01') THEN
+        WHEN sc.screen_type = 'IMAX' AND sh.show_date IN (CURRENT_DATE + INTERVAL '1 day', CURRENT_DATE + INTERVAL '2 days') THEN
             CASE cat.seat_category WHEN 'REGULAR' THEN 250 WHEN 'PREMIUM' THEN 360 ELSE 530 END
         WHEN sc.screen_type = 'IMAX' THEN
             CASE cat.seat_category WHEN 'REGULAR' THEN 220 WHEN 'PREMIUM' THEN 320 ELSE 480 END
-        WHEN sc.screen_type = '3D' AND sh.show_date IN ('2026-10-31', '2026-11-01') THEN
+        WHEN sc.screen_type = '3D' AND sh.show_date IN (CURRENT_DATE + INTERVAL '1 day', CURRENT_DATE + INTERVAL '2 days') THEN
             CASE cat.seat_category WHEN 'REGULAR' THEN 210 WHEN 'PREMIUM' THEN 300 ELSE 450 END
         WHEN sc.screen_type = '3D' THEN
             CASE cat.seat_category WHEN 'REGULAR' THEN 180 WHEN 'PREMIUM' THEN 260 ELSE 400 END
-        WHEN sh.show_date IN ('2026-10-31', '2026-11-01') THEN
+        WHEN sh.show_date IN (CURRENT_DATE + INTERVAL '1 day', CURRENT_DATE + INTERVAL '2 days') THEN
             CASE cat.seat_category WHEN 'REGULAR' THEN 180 WHEN 'PREMIUM' THEN 260 ELSE 400 END
         ELSE
             CASE cat.seat_category WHEN 'REGULAR' THEN 150 WHEN 'PREMIUM' THEN 220 ELSE 350 END
@@ -372,77 +379,79 @@ ORDER BY sh.show_id, cat.seat_category;
 -- ----------------------------------------------------------------------------
 -- 10. Customer (14 rows: 1 Admin, 12 Active Customers, 1 Customer who NEVER books)
 --     Note: password_hash below is a standard bcrypt hash for 'password123'
+--     created_at dates are relative to CURRENT_DATE (10-17 days ago)
 -- ----------------------------------------------------------------------------
 INSERT INTO Customer (name, email, phone, password_hash, role, created_at) VALUES
-    -- 1: Admin Account
-    ('Yashvant ATK', 'admin@cinebook.in', '9025106578', crypt('password123', gen_salt('bf', 10)), 'ADMIN', '2026-10-20 09:00:00+05:30'),
-    -- 2..13: Customers with bookings
-    ('Tharanesh R', 'tharanesh@cinebook.in', '9840112233', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-21 10:15:00+05:30'),
-    ('Mohit Sharma', 'mohit@cinebook.in', '9840223344', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-21 11:30:00+05:30'),
-    ('Ananya Iyer', 'ananya.iyer@gmail.com', '9840334455', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-22 14:20:00+05:30'),
-    ('Karthik Subramanian', 'karthik.s@gmail.com', '9840445566', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-22 16:45:00+05:30'),
-    ('Priya Nair', 'priya.nair@gmail.com', '9840556677', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-23 12:10:00+05:30'),
-    ('Rohan Deshmukh', 'rohan.d@gmail.com', '9840667788', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-23 18:05:00+05:30'),
-    ('Divya Menon', 'divya.menon@gmail.com', '9840778899', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-24 09:40:00+05:30'),
-    ('Arjun Reddy', 'arjun.reddy@gmail.com', '9840889900', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-24 15:30:00+05:30'),
-    ('Sneha Rao', 'sneha.rao@gmail.com', '9840990011', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-25 11:00:00+05:30'),
-    ('Vikramaditya V', 'vikram.v@gmail.com', '9841001122', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-25 17:25:00+05:30'),
-    ('Neha Gupta', 'neha.gupta@gmail.com', '9841112233', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-26 13:50:00+05:30'),
-    ('Siddharth Malhotra', 'sid.m@gmail.com', '9841223344', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-26 19:15:00+05:30'),
-    -- 14: Customer who NEVER books (powers Query #8 NOT EXISTS / NOT IN subquery)
-    ('Meera Krishnan', 'meera.krishnan@gmail.com', '9841334455', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-27 10:00:00+05:30'),
-    -- 15: Tharanesh's test account from README/commit message (also never booked initially)
-    ('Test Customer', 'test@example.com', '9841445566', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', '2026-10-27 11:00:00+05:30');
+    -- 1: Admin Account (17 days ago)
+    ('Yashvant ATK', 'admin@cinebook.in', '9025106578', crypt('password123', gen_salt('bf', 10)), 'ADMIN', (CURRENT_DATE - INTERVAL '17 days') + TIME '09:00:00+05:30'),
+    -- 2..13: Customers with bookings (16-10 days ago)
+    ('Tharanesh R', 'tharanesh@cinebook.in', '9840112233', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '16 days') + TIME '10:15:00+05:30'),
+    ('Mohit Sharma', 'mohit@cinebook.in', '9840223344', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '16 days') + TIME '11:30:00+05:30'),
+    ('Ananya Iyer', 'ananya.iyer@gmail.com', '9840334455', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '15 days') + TIME '14:20:00+05:30'),
+    ('Karthik Subramanian', 'karthik.s@gmail.com', '9840445566', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '15 days') + TIME '16:45:00+05:30'),
+    ('Priya Nair', 'priya.nair@gmail.com', '9840556677', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '14 days') + TIME '12:10:00+05:30'),
+    ('Rohan Deshmukh', 'rohan.d@gmail.com', '9840667788', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '14 days') + TIME '18:05:00+05:30'),
+    ('Divya Menon', 'divya.menon@gmail.com', '9840778899', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '13 days') + TIME '09:40:00+05:30'),
+    ('Arjun Reddy', 'arjun.reddy@gmail.com', '9840889900', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '13 days') + TIME '15:30:00+05:30'),
+    ('Sneha Rao', 'sneha.rao@gmail.com', '9840990011', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '12 days') + TIME '11:00:00+05:30'),
+    ('Vikramaditya V', 'vikram.v@gmail.com', '9841001122', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '12 days') + TIME '17:25:00+05:30'),
+    ('Neha Gupta', 'neha.gupta@gmail.com', '9841112233', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '11 days') + TIME '13:50:00+05:30'),
+    ('Siddharth Malhotra', 'sid.m@gmail.com', '9841223344', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '11 days') + TIME '19:15:00+05:30'),
+    -- 14: Customer who NEVER books (powers Query #8 NOT EXISTS / NOT IN subquery) (10 days ago)
+    ('Meera Krishnan', 'meera.krishnan@gmail.com', '9841334455', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '10 days') + TIME '10:00:00+05:30'),
+    -- 15: Tharanesh's test account from README/commit message (also never booked initially) (10 days ago)
+    ('Test Customer', 'test@example.com', '9841445566', crypt('password123', gen_salt('bf', 10)), 'CUSTOMER', (CURRENT_DATE - INTERVAL '10 days') + TIME '11:00:00+05:30');
 
 -- ----------------------------------------------------------------------------
 -- 11. Booking (32 rows: 27 CONFIRMED, 5 CANCELLED across 7 days)
 --     Every total_amount matches the exact sum of its Ticket prices.
+--     booking_time uses CURRENT_DATE offsets matching the show dates
 -- ----------------------------------------------------------------------------
 INSERT INTO Booking (customer_id, show_id, booking_time, total_amount, status) VALUES
-    -- Oct 27 bookings
-    (2,  1,  '2026-10-27 08:30:00+05:30', 660,  'CONFIRMED'), -- booking_id = 1  (3x REGULAR @ 220)
-    (3,  1,  '2026-10-27 09:00:00+05:30', 960,  'CONFIRMED'), -- booking_id = 2  (3x PREMIUM @ 320)
-    (4,  2,  '2026-10-27 14:15:00+05:30', 960,  'CONFIRMED'), -- booking_id = 3  (2x RECLINER @ 480)
-    (5,  3,  '2026-10-27 11:20:00+05:30', 540,  'CONFIRMED'), -- booking_id = 4  (3x REGULAR @ 180)
-    (6,  4,  '2026-10-27 16:00:00+05:30', 640,  'CONFIRMED'), -- booking_id = 5  (2x PREMIUM @ 320)
+    -- CURRENT_DATE - 3 days bookings
+    (2,  1,  (CURRENT_DATE - INTERVAL '3 days') + TIME '08:30:00+05:30', 660,  'CONFIRMED'), -- booking_id = 1  (3x REGULAR @ 220)
+    (3,  1,  (CURRENT_DATE - INTERVAL '3 days') + TIME '09:00:00+05:30', 960,  'CONFIRMED'), -- booking_id = 2  (3x PREMIUM @ 320)
+    (4,  2,  (CURRENT_DATE - INTERVAL '3 days') + TIME '14:15:00+05:30', 960,  'CONFIRMED'), -- booking_id = 3  (2x RECLINER @ 480)
+    (5,  3,  (CURRENT_DATE - INTERVAL '3 days') + TIME '11:20:00+05:30', 540,  'CONFIRMED'), -- booking_id = 4  (3x REGULAR @ 180)
+    (6,  4,  (CURRENT_DATE - INTERVAL '3 days') + TIME '16:00:00+05:30', 640,  'CONFIRMED'), -- booking_id = 5  (2x PREMIUM @ 320)
     -- Cancelled booking on show 1 (seats 4, 5) followed by re-booking in booking_id = 7!
-    (7,  1,  '2026-10-27 09:10:00+05:30', 440,  'CANCELLED'), -- booking_id = 6  (2x REGULAR @ 220 - CANCELLED)
-    (8,  1,  '2026-10-27 09:25:00+05:30', 440,  'CONFIRMED'), -- booking_id = 7  (Re-booked seats 4, 5 @ 220!)
+    (7,  1,  (CURRENT_DATE - INTERVAL '3 days') + TIME '09:10:00+05:30', 440,  'CANCELLED'), -- booking_id = 6  (2x REGULAR @ 220 - CANCELLED)
+    (8,  1,  (CURRENT_DATE - INTERVAL '3 days') + TIME '09:25:00+05:30', 440,  'CONFIRMED'), -- booking_id = 7  (Re-booked seats 4, 5 @ 220!)
 
-    -- Oct 28 bookings
-    (9,  5,  '2026-10-28 08:45:00+05:30', 960,  'CONFIRMED'), -- booking_id = 8  (3x PREMIUM @ 320)
-    (10, 6,  '2026-10-28 13:10:00+05:30', 800,  'CONFIRMED'), -- booking_id = 9  (2x RECLINER @ 400)
-    (11, 7,  '2026-10-28 12:00:00+05:30', 450,  'CONFIRMED'), -- booking_id = 10 (3x REGULAR @ 150)
-    (12, 8,  '2026-10-28 15:30:00+05:30', 660,  'CONFIRMED'), -- booking_id = 11 (3x PREMIUM @ 220)
-    (13, 6,  '2026-10-28 14:00:00+05:30', 360,  'CANCELLED'), -- booking_id = 12 (2x REGULAR @ 180 - CANCELLED)
+    -- CURRENT_DATE - 2 days bookings
+    (9,  5,  (CURRENT_DATE - INTERVAL '2 days') + TIME '08:45:00+05:30', 960,  'CONFIRMED'), -- booking_id = 8  (3x PREMIUM @ 320)
+    (10, 6,  (CURRENT_DATE - INTERVAL '2 days') + TIME '13:10:00+05:30', 800,  'CONFIRMED'), -- booking_id = 9  (2x RECLINER @ 400)
+    (11, 7,  (CURRENT_DATE - INTERVAL '2 days') + TIME '12:00:00+05:30', 450,  'CONFIRMED'), -- booking_id = 10 (3x REGULAR @ 150)
+    (12, 8,  (CURRENT_DATE - INTERVAL '2 days') + TIME '15:30:00+05:30', 660,  'CONFIRMED'), -- booking_id = 11 (3x PREMIUM @ 220)
+    (13, 6,  (CURRENT_DATE - INTERVAL '2 days') + TIME '14:00:00+05:30', 360,  'CANCELLED'), -- booking_id = 12 (2x REGULAR @ 180 - CANCELLED)
 
-    -- Oct 29 bookings
-    (2,  9,  '2026-10-29 10:00:00+05:30', 1440, 'CONFIRMED'), -- booking_id = 13 (3x RECLINER @ 480)
-    (4,  10, '2026-10-29 09:15:00+05:30', 780,  'CONFIRMED'), -- booking_id = 14 (3x PREMIUM @ 260)
-    (5,  11, '2026-10-29 13:45:00+05:30', 1280, 'CONFIRMED'), -- booking_id = 15 (4x PREMIUM @ 320)
-    (6,  12, '2026-10-29 11:30:00+05:30', 700,  'CONFIRMED'), -- booking_id = 16 (2x RECLINER @ 350)
+    -- CURRENT_DATE - 1 day bookings
+    (2,  9,  (CURRENT_DATE - INTERVAL '1 day') + TIME '10:00:00+05:30', 1440, 'CONFIRMED'), -- booking_id = 13 (3x RECLINER @ 480)
+    (4,  10, (CURRENT_DATE - INTERVAL '1 day') + TIME '09:15:00+05:30', 780,  'CONFIRMED'), -- booking_id = 14 (3x PREMIUM @ 260)
+    (5,  11, (CURRENT_DATE - INTERVAL '1 day') + TIME '13:45:00+05:30', 1280, 'CONFIRMED'), -- booking_id = 15 (4x PREMIUM @ 320)
+    (6,  12, (CURRENT_DATE - INTERVAL '1 day') + TIME '11:30:00+05:30', 700,  'CONFIRMED'), -- booking_id = 16 (2x RECLINER @ 350)
 
-    -- Oct 30 bookings
-    (3,  13, '2026-10-30 08:20:00+05:30', 880,  'CONFIRMED'), -- booking_id = 17 (4x REGULAR @ 220)
-    (7,  14, '2026-10-30 12:10:00+05:30', 960,  'CONFIRMED'), -- booking_id = 18 (3x PREMIUM @ 320)
-    (8,  15, '2026-10-30 10:30:00+05:30', 300,  'CANCELLED'), -- booking_id = 19 (2x REGULAR @ 150 - CANCELLED)
-    (9,  16, '2026-10-30 14:00:00+05:30', 1440, 'CONFIRMED'), -- booking_id = 20 (3x RECLINER @ 480)
-    (10, 17, '2026-10-30 11:45:00+05:30', 600,  'CONFIRMED'), -- booking_id = 21 (4x REGULAR @ 150)
+    -- CURRENT_DATE bookings
+    (3,  13, CURRENT_DATE + TIME '08:20:00+05:30', 880,  'CONFIRMED'), -- booking_id = 17 (4x REGULAR @ 220)
+    (7,  14, CURRENT_DATE + TIME '12:10:00+05:30', 960,  'CONFIRMED'), -- booking_id = 18 (3x PREMIUM @ 320)
+    (8,  15, CURRENT_DATE + TIME '10:30:00+05:30', 300,  'CANCELLED'), -- booking_id = 19 (2x REGULAR @ 150 - CANCELLED)
+    (9,  16, CURRENT_DATE + TIME '14:00:00+05:30', 1440, 'CONFIRMED'), -- booking_id = 20 (3x RECLINER @ 480)
+    (10, 17, CURRENT_DATE + TIME '11:45:00+05:30', 600,  'CONFIRMED'), -- booking_id = 21 (4x REGULAR @ 150)
 
-    -- Oct 31 (Weekend) bookings
-    (2,  18, '2026-10-31 08:00:00+05:30', 1080, 'CONFIRMED'), -- booking_id = 22 (3x PREMIUM @ 360)
-    (4,  19, '2026-10-31 09:30:00+05:30', 1060, 'CONFIRMED'), -- booking_id = 23 (2x RECLINER @ 530)
-    (5,  20, '2026-10-31 11:15:00+05:30', 900,  'CONFIRMED'), -- booking_id = 24 (3x PREMIUM @ 300)
-    (11, 21, '2026-10-31 09:00:00+05:30', 360,  'CANCELLED'), -- booking_id = 25 (2x REGULAR @ 180 - CANCELLED)
-    (12, 22, '2026-10-31 12:30:00+05:30', 1000, 'CONFIRMED'), -- booking_id = 26 (4x REGULAR @ 250)
-    (13, 23, '2026-10-31 10:45:00+05:30', 800,  'CONFIRMED'), -- booking_id = 27 (2x RECLINER @ 400)
+    -- CURRENT_DATE + 1 day (Weekend) bookings
+    (2,  18, (CURRENT_DATE + INTERVAL '1 day') + TIME '08:00:00+05:30', 1080, 'CONFIRMED'), -- booking_id = 22 (3x PREMIUM @ 360)
+    (4,  19, (CURRENT_DATE + INTERVAL '1 day') + TIME '09:30:00+05:30', 1060, 'CONFIRMED'), -- booking_id = 23 (2x RECLINER @ 530)
+    (5,  20, (CURRENT_DATE + INTERVAL '1 day') + TIME '11:15:00+05:30', 900,  'CONFIRMED'), -- booking_id = 24 (3x PREMIUM @ 300)
+    (11, 21, (CURRENT_DATE + INTERVAL '1 day') + TIME '09:00:00+05:30', 360,  'CANCELLED'), -- booking_id = 25 (2x REGULAR @ 180 - CANCELLED)
+    (12, 22, (CURRENT_DATE + INTERVAL '1 day') + TIME '12:30:00+05:30', 1000, 'CONFIRMED'), -- booking_id = 26 (4x REGULAR @ 250)
+    (13, 23, (CURRENT_DATE + INTERVAL '1 day') + TIME '10:45:00+05:30', 800,  'CONFIRMED'), -- booking_id = 27 (2x RECLINER @ 400)
 
-    -- Nov 01 (Weekend) & Nov 02 bookings
-    (3,  24, '2026-10-31 18:00:00+05:30', 750,  'CONFIRMED'), -- booking_id = 28 (3x REGULAR @ 250)
-    (6,  25, '2026-10-31 19:00:00+05:30', 1060, 'CONFIRMED'), -- booking_id = 29 (2x RECLINER @ 530)
-    (7,  26, '2026-10-31 20:00:00+05:30', 630,  'CONFIRMED'), -- booking_id = 30 (3x REGULAR @ 210)
-    (8,  28, '2026-10-31 20:30:00+05:30', 720,  'CANCELLED'), -- booking_id = 31 (2x PREMIUM @ 360 - CANCELLED)
-    (9,  30, '2026-10-31 21:00:00+05:30', 640,  'CONFIRMED'); -- booking_id = 32 (2x PREMIUM @ 320)
+    -- CURRENT_DATE + 2 days (Weekend) & CURRENT_DATE + 3 days bookings
+    (3,  24, (CURRENT_DATE + INTERVAL '1 day') + TIME '18:00:00+05:30', 750,  'CONFIRMED'), -- booking_id = 28 (3x REGULAR @ 250)
+    (6,  25, (CURRENT_DATE + INTERVAL '1 day') + TIME '19:00:00+05:30', 1060, 'CONFIRMED'), -- booking_id = 29 (2x RECLINER @ 530)
+    (7,  26, (CURRENT_DATE + INTERVAL '1 day') + TIME '20:00:00+05:30', 630,  'CONFIRMED'), -- booking_id = 30 (3x REGULAR @ 210)
+    (8,  28, (CURRENT_DATE + INTERVAL '1 day') + TIME '20:30:00+05:30', 720,  'CANCELLED'), -- booking_id = 31 (2x PREMIUM @ 360 - CANCELLED)
+    (9,  30, (CURRENT_DATE + INTERVAL '1 day') + TIME '21:00:00+05:30', 640,  'CONFIRMED'); -- booking_id = 32 (2x PREMIUM @ 320)
 
 -- ----------------------------------------------------------------------------
 -- 12. Ticket (84 rows across the 32 bookings)
@@ -575,39 +584,40 @@ INSERT INTO Ticket (booking_id, show_id, seat_id, price, status) VALUES
 
 -- ----------------------------------------------------------------------------
 -- 13. Payment (32 rows: mix of UPI, CARD, CASH; SUCCESS, REFUNDED, FAILED)
+--     paid_at uses CURRENT_DATE offsets matching the booking dates
 -- ----------------------------------------------------------------------------
 INSERT INTO Payment (booking_id, amount, method, status, paid_at) VALUES
-    (1,  660,  'UPI',  'SUCCESS',  '2026-10-27 08:31:00+05:30'),
-    (2,  960,  'CARD', 'SUCCESS',  '2026-10-27 09:01:00+05:30'),
-    (3,  960,  'UPI',  'SUCCESS',  '2026-10-27 14:16:00+05:30'),
-    (4,  540,  'CASH', 'SUCCESS',  '2026-10-27 11:21:00+05:30'),
-    (5,  640,  'UPI',  'SUCCESS',  '2026-10-27 16:01:00+05:30'),
-    (6,  440,  'UPI',  'REFUNDED', '2026-10-27 09:11:00+05:30'),
-    (7,  440,  'CARD', 'SUCCESS',  '2026-10-27 09:26:00+05:30'),
-    (8,  960,  'UPI',  'SUCCESS',  '2026-10-28 08:46:00+05:30'),
-    (9,  800,  'CARD', 'SUCCESS',  '2026-10-28 13:11:00+05:30'),
-    (10, 450,  'CASH', 'SUCCESS',  '2026-10-28 12:01:00+05:30'),
-    (11, 660,  'UPI',  'SUCCESS',  '2026-10-28 15:31:00+05:30'),
-    (12, 360,  'CARD', 'REFUNDED', '2026-10-28 14:01:00+05:30'),
-    (13, 1440, 'CARD', 'SUCCESS',  '2026-10-29 10:01:00+05:30'),
-    (14, 780,  'UPI',  'SUCCESS',  '2026-10-29 09:16:00+05:30'),
-    (15, 1280, 'UPI',  'SUCCESS',  '2026-10-29 13:46:00+05:30'),
-    (16, 700,  'CASH', 'SUCCESS',  '2026-10-29 11:31:00+05:30'),
-    (17, 880,  'UPI',  'SUCCESS',  '2026-10-30 08:21:00+05:30'),
-    (18, 960,  'CARD', 'SUCCESS',  '2026-10-30 12:11:00+05:30'),
-    (19, 300,  'UPI',  'FAILED',   '2026-10-30 10:31:00+05:30'),
-    (20, 1440, 'CARD', 'SUCCESS',  '2026-10-30 14:01:00+05:30'),
-    (21, 600,  'CASH', 'SUCCESS',  '2026-10-30 11:46:00+05:30'),
-    (22, 1080, 'UPI',  'SUCCESS',  '2026-10-31 08:01:00+05:30'),
-    (23, 1060, 'CARD', 'SUCCESS',  '2026-10-31 09:31:00+05:30'),
-    (24, 900,  'UPI',  'SUCCESS',  '2026-10-31 11:16:00+05:30'),
-    (25, 360,  'UPI',  'REFUNDED', '2026-10-31 09:01:00+05:30'),
-    (26, 1000, 'CARD', 'SUCCESS',  '2026-10-31 12:31:00+05:30'),
-    (27, 800,  'UPI',  'SUCCESS',  '2026-10-31 10:46:00+05:30'),
-    (28, 750,  'UPI',  'SUCCESS',  '2026-10-31 18:01:00+05:30'),
-    (29, 1060, 'CARD', 'SUCCESS',  '2026-10-31 19:01:00+05:30'),
-    (30, 630,  'CASH', 'SUCCESS',  '2026-10-31 20:01:00+05:30'),
-    (31, 720,  'CARD', 'REFUNDED', '2026-10-31 20:31:00+05:30'),
-    (32, 640,  'UPI',  'SUCCESS',  '2026-10-31 21:01:00+05:30');
+    (1,  660,  'UPI',  'SUCCESS',  (CURRENT_DATE - INTERVAL '3 days') + TIME '08:31:00+05:30'),
+    (2,  960,  'CARD', 'SUCCESS',  (CURRENT_DATE - INTERVAL '3 days') + TIME '09:01:00+05:30'),
+    (3,  960,  'UPI',  'SUCCESS',  (CURRENT_DATE - INTERVAL '3 days') + TIME '14:16:00+05:30'),
+    (4,  540,  'CASH', 'SUCCESS',  (CURRENT_DATE - INTERVAL '3 days') + TIME '11:21:00+05:30'),
+    (5,  640,  'UPI',  'SUCCESS',  (CURRENT_DATE - INTERVAL '3 days') + TIME '16:01:00+05:30'),
+    (6,  440,  'UPI',  'REFUNDED', (CURRENT_DATE - INTERVAL '3 days') + TIME '09:11:00+05:30'),
+    (7,  440,  'CARD', 'SUCCESS',  (CURRENT_DATE - INTERVAL '3 days') + TIME '09:26:00+05:30'),
+    (8,  960,  'UPI',  'SUCCESS',  (CURRENT_DATE - INTERVAL '2 days') + TIME '08:46:00+05:30'),
+    (9,  800,  'CARD', 'SUCCESS',  (CURRENT_DATE - INTERVAL '2 days') + TIME '13:11:00+05:30'),
+    (10, 450,  'CASH', 'SUCCESS',  (CURRENT_DATE - INTERVAL '2 days') + TIME '12:01:00+05:30'),
+    (11, 660,  'UPI',  'SUCCESS',  (CURRENT_DATE - INTERVAL '2 days') + TIME '15:31:00+05:30'),
+    (12, 360,  'CARD', 'REFUNDED', (CURRENT_DATE - INTERVAL '2 days') + TIME '14:01:00+05:30'),
+    (13, 1440, 'CARD', 'SUCCESS',  (CURRENT_DATE - INTERVAL '1 day') + TIME '10:01:00+05:30'),
+    (14, 780,  'UPI',  'SUCCESS',  (CURRENT_DATE - INTERVAL '1 day') + TIME '09:16:00+05:30'),
+    (15, 1280, 'UPI',  'SUCCESS',  (CURRENT_DATE - INTERVAL '1 day') + TIME '13:46:00+05:30'),
+    (16, 700,  'CASH', 'SUCCESS',  (CURRENT_DATE - INTERVAL '1 day') + TIME '11:31:00+05:30'),
+    (17, 880,  'UPI',  'SUCCESS',  CURRENT_DATE + TIME '08:21:00+05:30'),
+    (18, 960,  'CARD', 'SUCCESS',  CURRENT_DATE + TIME '12:11:00+05:30'),
+    (19, 300,  'UPI',  'FAILED',   CURRENT_DATE + TIME '10:31:00+05:30'),
+    (20, 1440, 'CARD', 'SUCCESS',  CURRENT_DATE + TIME '14:01:00+05:30'),
+    (21, 600,  'CASH', 'SUCCESS',  CURRENT_DATE + TIME '11:46:00+05:30'),
+    (22, 1080, 'UPI',  'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '08:01:00+05:30'),
+    (23, 1060, 'CARD', 'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '09:31:00+05:30'),
+    (24, 900,  'UPI',  'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '11:16:00+05:30'),
+    (25, 360,  'UPI',  'REFUNDED', (CURRENT_DATE + INTERVAL '1 day') + TIME '09:01:00+05:30'),
+    (26, 1000, 'CARD', 'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '12:31:00+05:30'),
+    (27, 800,  'UPI',  'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '10:46:00+05:30'),
+    (28, 750,  'UPI',  'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '18:01:00+05:30'),
+    (29, 1060, 'CARD', 'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '19:01:00+05:30'),
+    (30, 630,  'CASH', 'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '20:01:00+05:30'),
+    (31, 720,  'CARD', 'REFUNDED', (CURRENT_DATE + INTERVAL '1 day') + TIME '20:31:00+05:30'),
+    (32, 640,  'UPI',  'SUCCESS',  (CURRENT_DATE + INTERVAL '1 day') + TIME '21:01:00+05:30');
 
 COMMIT;

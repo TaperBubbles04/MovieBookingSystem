@@ -3,65 +3,117 @@
 {% block title %}Admin Dashboard - CineBook{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-    <p class="text-gray-600 mt-1">Welcome, {{ user.name }} (Admin)</p>
+<div class="mb-4">
+    <h1 class="h3 fw-bold">Admin Dashboard</h1>
+    <p class="text-muted mt-1">Welcome, {{ user.name }} (Admin)</p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-sm text-gray-500">Total Tickets Sold</div>
-        <div class="text-3xl font-bold text-indigo-600">{{ stats.total_tickets_sold }}</div>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-4 mb-5">
+    <div class="col">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Tickets Sold</div>
+                <div class="display-5 fw-bold text-primary">{{ stats.total_tickets_sold }}</div>
+            </div>
+        </div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-sm text-gray-500">Total Revenue</div>
-        <div class="text-3xl font-bold text-green-600">₹{{ stats.total_revenue }}</div>
+    <div class="col">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Revenue</div>
+                <div class="display-5 fw-bold text-success">₹{{ stats.total_revenue }}</div>
+            </div>
+        </div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-sm text-gray-500">Avg Ticket Price</div>
-        <div class="text-3xl font-bold text-blue-600">₹{{ stats.avg_ticket_price }}</div>
+    <div class="col">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Avg Ticket Price</div>
+                <div class="display-5 fw-bold text-info">₹{{ stats.avg_ticket_price }}</div>
+            </div>
+        </div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-sm text-gray-500">Highest Price</div>
-        <div class="text-3xl font-bold text-purple-600">₹{{ stats.highest_ticket_price }}</div>
+    <div class="col">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Highest Price</div>
+                <div class="display-5 fw-bold text-purple">{{ stats.highest_ticket_price }}</div>
+            </div>
+        </div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-sm text-gray-500">Lowest Price</div>
-        <div class="text-3xl font-bold text-gray-600">₹{{ stats.lowest_ticket_price }}</div>
+    <div class="col">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Lowest Price</div>
+                <div class="display-5 fw-bold text-secondary">{{ stats.lowest_ticket_price }}</div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="bg-white rounded-xl shadow p-6">
-    <h2 class="text-xl font-semibold mb-4">Reports</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="/reports/revenue-by-movie" class="p-4 border rounded-lg hover:bg-gray-50 transition">
-            <div class="font-medium">Revenue by Movie</div>
-            <div class="text-sm text-gray-500">Total revenue & tickets per movie</div>
-        </a>
-        <a href="/reports/occupancy" class="p-4 border rounded-lg hover:bg-gray-50 transition">
-            <div class="font-medium">Occupancy</div>
-            <div class="text-sm text-gray-500">Show occupancy percentages</div>
-        </a>
-        <a href="/reports/top-customers" class="p-4 border rounded-lg hover:bg-gray-50 transition">
-            <div class="font-medium">Top Customers</div>
-            <div class="text-sm text-gray-500">Biggest spenders</div>
-        </a>
-        <a href="/reports/daily-sales" class="p-4 border rounded-lg hover:bg-gray-50 transition">
-            <div class="font-medium">Daily Sales</div>
-            <div class="text-sm text-gray-500">Revenue & bookings per day</div>
-        </a>
-        <a href="/reports/unsold-movies" class="p-4 border rounded-lg hover:bg-gray-50 transition">
-            <div class="font-medium">Unsold Movies</div>
-            <div class="text-sm text-gray-500">Movies with no shows</div>
-        </a>
-        <a href="/reports/unbooked-customers" class="p-4 border rounded-lg hover:bg-gray-50 transition">
-            <div class="font-medium">Inactive Customers</div>
-            <div class="text-sm text-gray-500">Customers who never booked</div>
-        </a>
-        <a href="/reports/busiest-screens" class="p-4 border rounded-lg hover:bg-gray-50 transition">
-            <div class="font-medium">Busiest Screens</div>
-            <div class="text-sm text-gray-500">Theatres/screens by tickets sold</div>
-        </a>
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h2 class="h5 mb-0">Reports</h2>
+    </div>
+    <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+            <a href="/reports/revenue-by-movie" class="col text-decoration-none">
+                <div class="card h-100 border hover-shadow transition">
+                    <div class="card-body">
+                        <div class="fw-medium">Revenue by Movie</div>
+                        <div class="text-muted small">Total revenue & tickets per movie</div>
+                    </div>
+                </div>
+            </a>
+            <a href="/reports/occupancy" class="col text-decoration-none">
+                <div class="card h-100 border hover-shadow transition">
+                    <div class="card-body">
+                        <div class="fw-medium">Occupancy</div>
+                        <div class="text-muted small">Show occupancy percentages</div>
+                    </div>
+                </div>
+            </a>
+            <a href="/reports/top-customers" class="col text-decoration-none">
+                <div class="card h-100 border hover-shadow transition">
+                    <div class="card-body">
+                        <div class="fw-medium">Top Customers</div>
+                        <div class="text-muted small">Biggest spenders</div>
+                    </div>
+                </div>
+            </a>
+            <a href="/reports/daily-sales" class="col text-decoration-none">
+                <div class="card h-100 border hover-shadow transition">
+                    <div class="card-body">
+                        <div class="fw-medium">Daily Sales</div>
+                        <div class="text-muted small">Revenue & bookings per day</div>
+                    </div>
+                </div>
+            </a>
+            <a href="/reports/unsold-movies" class="col text-decoration-none">
+                <div class="card h-100 border hover-shadow transition">
+                    <div class="card-body">
+                        <div class="fw-medium">Unsold Movies</div>
+                        <div class="text-muted small">Movies with no shows</div>
+                    </div>
+                </div>
+            </a>
+            <a href="/reports/unbooked-customers" class="col text-decoration-none">
+                <div class="card h-100 border hover-shadow transition">
+                    <div class="card-body">
+                        <div class="fw-medium">Inactive Customers</div>
+                        <div class="text-muted small">Customers who never booked</div>
+                    </div>
+                </div>
+            </a>
+            <a href="/reports/busiest-screens" class="col text-decoration-none">
+                <div class="card h-100 border hover-shadow transition">
+                    <div class="card-body">
+                        <div class="fw-medium">Busiest Screens</div>
+                        <div class="text-muted small">Theatres/screens by tickets sold</div>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

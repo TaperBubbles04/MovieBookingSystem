@@ -859,16 +859,6 @@ async def report_busiest_screens(request: Request):
     })
 
 
-# ===== API ROUTES (to be added later) =====
-# from routers import auth, movies, theatres, shows, bookings, reports
-# app.include_router(auth.router, prefix="/auth", tags=["auth"])
-# ...
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
 # ===== ERROR HANDLERS =====
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
@@ -879,3 +869,13 @@ async def not_found_handler(request: Request, exc: HTTPException):
 async def server_error_handler(request: Request, exc: Exception):
     user = await get_current_user(request)
     return templates.TemplateResponse(request, "error.html", {"user": user}, status_code=500)
+
+
+# ===== API ROUTES (to be added later) =====
+# from routers import auth, movies, theatres, shows, bookings, reports
+# app.include_router(auth.router, prefix="/auth", tags=["auth"])
+# ...
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -20,7 +20,8 @@
 -- Concepts: SELECT, WHERE, ORDER BY (plus JOINs for theatre & screen context)
 -- App Screen: Customer Show Picker (GET /shows?movie_id=1&date=2026-10-31)
 -- ----------------------------------------------------------------------------
-\echo '=== QUERY 1: Shows for Movie #1 (Leo) on 2026-10-31, earliest first ==='
+-- Using CURRENT_DATE + 2 days (weekend day with shows for Movie #1 Leo)
+\echo '=== QUERY 1: Shows for Movie #1 (Leo) on CURRENT_DATE+2 (weekend), earliest first ==='
 SELECT
     sh.show_id,
     m.title AS movie_title,
@@ -36,7 +37,7 @@ JOIN Movie m ON m.movie_id = sh.movie_id
 JOIN Screen sc ON sc.screen_id = sh.screen_id
 JOIN Theatre th ON th.theatre_id = sc.theatre_id
 WHERE sh.movie_id = 1
-  AND sh.show_date = '2026-10-31'
+  AND sh.show_date = CURRENT_DATE + INTERVAL '2 days'
 ORDER BY sh.start_time ASC;
 
 
@@ -284,7 +285,7 @@ SELECT
     SUM(b.total_amount) AS revenue
 FROM Booking b
 WHERE b.status = 'CONFIRMED'
-  AND (b.booking_time AT TIME ZONE 'Asia/Kolkata')::DATE >= DATE '2026-10-25'
+  AND (b.booking_time AT TIME ZONE 'Asia/Kolkata')::DATE >= CURRENT_DATE - INTERVAL '7 days'
 GROUP BY (b.booking_time AT TIME ZONE 'Asia/Kolkata')::DATE
 ORDER BY sale_date ASC;
 
@@ -294,6 +295,7 @@ ORDER BY sale_date ASC;
 -- Concepts: Subquery excluding active tickets for that show
 -- App Screen: Customer Seat Map (GET /shows/{id}/seats)
 -- ----------------------------------------------------------------------------
+-- Using show_id = 1 (first show on CURRENT_DATE - 3 days)
 \echo '=== QUERY 13: Seats Still Available for Show #1 (Subquery Excluding Active Tickets) ==='
 SELECT
     st.seat_id,
@@ -450,7 +452,7 @@ CREATE INDEX IF NOT EXISTS idx_show_date_movie ON Show (show_date, movie_id);
 EXPLAIN ANALYZE
 SELECT show_id, screen_id, start_time, end_time
 FROM Show
-WHERE show_date = '2026-10-31' AND movie_id = 1;
+WHERE show_date = CURRENT_DATE + INTERVAL '2 days' AND movie_id = 1;
 
 
 -- ============================================================================
@@ -462,8 +464,9 @@ WHERE show_date = '2026-10-31' AND movie_id = 1;
 BEGIN;
 
 -- 1. INSERT Demo: Add a new movie with no shows, then update it, then delete it
+-- Release date is 4 days in the future
 INSERT INTO Movie (title, description, duration_min, language, certificate, release_date, rating)
-VALUES ('vettaiyan Demo Movie', 'Temporary movie inserted to demonstrate INSERT, UPDATE, and DELETE.', 163, 'Tamil', 'UA', '2026-11-10', 8.0)
+VALUES ('vettaiyan Demo Movie', 'Temporary movie inserted to demonstrate INSERT, UPDATE, and DELETE.', 163, 'Tamil', 'UA', CURRENT_DATE + INTERVAL '4 days', 8.0)
 RETURNING movie_id, title, rating;
 
 -- 2. UPDATE Demo: Edit movie rating and update a show price tier

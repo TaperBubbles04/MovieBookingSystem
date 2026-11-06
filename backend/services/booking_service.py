@@ -52,14 +52,16 @@ def create_booking(cur, customer_id: int, show_id: int, seat_ids: list, payment_
     
     # 4. Check no active tickets
     cur.execute(f"""
-        SELECT seat_id FROM Ticket 
-        WHERE show_id = %s AND seat_id IN ({placeholders}) AND status = 'ACTIVE'
+        SELECT t.seat_id, s.row_label, s.seat_number
+        FROM Ticket t
+        JOIN Seat s ON t.seat_id = s.seat_id
+        WHERE t.show_id = %s AND t.seat_id IN ({placeholders}) AND t.status = 'ACTIVE'
         FOR SHARE
     """, [show_id] + seat_ids)
     taken = cur.fetchall()
     if taken:
-        taken_seat_ids = [t[0] for t in taken]
-        raise ValueError(f"Seat(s) {taken_seat_ids} already booked")
+        taken_seats = [f"{row_label}-{seat_number}" for _, row_label, seat_number in taken]
+        raise ValueError(f"Seat(s) {', '.join(taken_seats)} already booked. Please select different seats.")
     
     # 5. Calculate total from Show_Pricing
     cur.execute("""
