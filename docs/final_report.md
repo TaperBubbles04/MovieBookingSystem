@@ -6,9 +6,9 @@
 
 | Team Member | Role | Core Ownership |
 | :--- | :--- | :--- |
-| **Tharanesh R** | Backend & Database Engineer | PostgreSQL schema, constraints, triggers, atomic booking & cancellation transactions (`FOR UPDATE`), FastAPI routes & authentication |
-| **Mohit** | Frontend Lead (Customer Experience) | Customer UI templates (browse, filters, interactive seat map, checkout, confirmation ticket, booking history) & route integration |
-| **Yashvant A T K (ATK)** | Admin, Data, SQL Showcase & Documentation Lead | ER diagram, 3NF relational schema, realistic Indian multiplex seed data, 3 SQL views, 14 showcase queries, Admin & Reports UI, testing log, and final report |
+| **Tharanesh Suresh Kannan** | Backend & Database Engineer | PostgreSQL schema, constraints, triggers, atomic booking & cancellation transactions (`FOR UPDATE`), FastAPI routes & authentication |
+| **A Mohit Kumar** | Frontend Lead (Customer Experience) | Customer UI templates (browse, filters, interactive seat map, checkout, confirmation ticket, booking history) & route integration |
+| **Yashvant A T K** | Admin, Data, SQL Showcase & Documentation Lead | ER diagram, 3NF relational schema, realistic Indian multiplex seed data, 3 SQL views, 14 showcase queries, Admin & Reports UI, testing log, and final report |
 
 ## 1. Problem Statement and Objectives
 
