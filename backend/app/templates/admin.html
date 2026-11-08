@@ -37,7 +37,7 @@
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Highest Price</div>
-                <div class="display-5 fw-bold text-purple">{{ stats.highest_ticket_price }}</div>
+                <div class="display-5 fw-bold text-purple">₹{{ stats.highest_ticket_price }}</div>
             </div>
         </div>
     </div>
@@ -45,8 +45,42 @@
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted small">Lowest Price</div>
-                <div class="display-5 fw-bold text-secondary">{{ stats.lowest_ticket_price }}</div>
+                <div class="display-5 fw-bold text-secondary">₹{{ stats.lowest_ticket_price }}</div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-5">
+    <div class="card-header">
+        <h2 class="h5 mb-0">Manage</h2>
+    </div>
+    <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-3 g-3">
+            <a href="{{ url_for('admin_movies') }}" class="col text-decoration-none">
+                <div class="card h-100 border">
+                    <div class="card-body">
+                        <div class="fw-medium">Movies</div>
+                        <div class="text-muted small">Add, edit and delete movies</div>
+                    </div>
+                </div>
+            </a>
+            <a href="{{ url_for('admin_theatres') }}" class="col text-decoration-none">
+                <div class="card h-100 border">
+                    <div class="card-body">
+                        <div class="fw-medium">Theatres &amp; Screens</div>
+                        <div class="text-muted small">Add theatres, and screens with their seats</div>
+                    </div>
+                </div>
+            </a>
+            <a href="{{ url_for('admin_shows') }}" class="col text-decoration-none">
+                <div class="card h-100 border">
+                    <div class="card-body">
+                        <div class="fw-medium">Shows &amp; Pricing</div>
+                        <div class="text-muted small">Schedule shows and set category prices</div>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </div>

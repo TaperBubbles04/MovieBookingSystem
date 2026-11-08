@@ -236,6 +236,13 @@ async def logout(request: Request):
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
+# The navbar links to the admin dashboard; it needs the real app and database.
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_dashboard(request: Request):
+    flash(request, "The admin pages need the real app and database (uvicorn main:app).", "info")
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+
 # ---- Error pages. /preview/error exists only here, to look at error.html ----
 
 @app.get("/preview/error")

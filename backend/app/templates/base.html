@@ -29,8 +29,10 @@
                href="{{ url_for('my_bookings') }}">My Bookings</a>
           </li>
           {% if user and user.role == 'ADMIN' %}
-            {# ATK's admin pages; no route exists yet, so this is a plain path for now. #}
-            <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
+            <li class="nav-item">
+              <a class="nav-link {% if path.startswith('/admin') or path.startswith('/reports') %}active{% endif %}"
+                 href="{{ url_for('admin_dashboard') }}">Admin</a>
+            </li>
           {% endif %}
         </ul>
         <ul class="navbar-nav align-items-md-center gap-2">

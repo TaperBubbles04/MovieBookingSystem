@@ -188,6 +188,7 @@ body {
 .movie-description { max-width: 60ch; }
 
 .hero-lead { max-width: 36rem; }
+.price-input { width: 6rem; }
 .hero-search { max-width: 32rem; }
 
 .genre-badge {

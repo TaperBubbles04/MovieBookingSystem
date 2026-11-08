@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Theatres & Screens{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1">Theatres &amp; screens</h1>
+    <p class="text-muted mb-0">Adding a screen also creates all of its seats.</p>
+  </div>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">&larr; Dashboard</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    {% for t in theatres %}
+      <div class="cb-card p-4 mb-4">
+        <h2 class="h5 mb-0">{{ t.name }}</h2>
+        <p class="small text-muted">{{ t.city }} &middot; {{ t.address }}</p>
+
+        {% if t.screens %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead><tr class="small text-muted"><th>Screen</th><th>Type</th><th class="text-end">Seats</th><th class="text-end">Regular / Premium / Recliner</th></tr></thead>
+              <tbody>
+                {% for s in t.screens %}
+                  <tr>
+                    <td class="fw-semibold">{{ s.screen_name }}</td>
+                    <td>{{ s.screen_type }}</td>
+                    <td class="text-end">{{ s.seats }}</td>
+                    <td class="text-end">{{ s.regular }} / {{ s.premium }} / {{ s.recliner }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="small text-muted">No screens yet.</p>
+        {% endif %}
+
+        <details>
+          <summary class="small text-accent">+ Add a screen</summary>
+          <form method="post" action="{{ url_for('admin_screen_create', theatre_id=t.theatre_id) }}"
+                class="row g-2 mt-2 needs-validation" novalidate data-single-submit>
+            <div class="col-6 col-md-4">
+              <label class="form-label small" for="sn-{{ t.theatre_id }}">Screen name</label>
+              <input class="form-control form-control-sm" id="sn-{{ t.theatre_id }}" name="screen_name" placeholder="Screen 4" required maxlength="50">
+            </div>
+            <div class="col-6 col-md-2">
+              <label class="form-label small" for="st-{{ t.theatre_id }}">Type</label>
+              <select class="form-select form-select-sm" id="st-{{ t.theatre_id }}" name="screen_type">
+                <option>2D</option><option>3D</option><option>IMAX</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label small" for="rc-{{ t.theatre_id }}">Rows (A, B, C...)</label>
+              <input type="number" class="form-control form-control-sm" id="rc-{{ t.theatre_id }}" name="row_count" min="1" max="26" value="6" required>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label small" for="sp-{{ t.theatre_id }}">Seats per row</label>
+              <input type="number" class="form-control form-control-sm" id="sp-{{ t.theatre_id }}" name="seats_per_row" min="1" max="40" value="10" required>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label small" for="pr-{{ t.theatre_id }}">Premium rows</label>
+              <input type="number" class="form-control form-control-sm" id="pr-{{ t.theatre_id }}" name="premium_rows" min="0" max="26" value="2">
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label small" for="rr-{{ t.theatre_id }}">Recliner rows (back)</label>
+              <input type="number" class="form-control form-control-sm" id="rr-{{ t.theatre_id }}" name="recliner_rows" min="0" max="26" value="1">
+            </div>
+            <div class="col-12 col-md-6 d-flex align-items-end">
+              <button type="submit" class="btn btn-sm btn-accent">Add screen and seats</button>
+            </div>
+          </form>
+        </details>
+      </div>
+    {% else %}
+      <div class="empty-state">No theatres yet. Add one with the form.</div>
+    {% endfor %}
+  </div>
+
+  <div class="col-lg-4">
+    <form method="post" action="{{ url_for('admin_theatre_create') }}" class="cb-card p-4 needs-validation" novalidate data-single-submit>
+      <h2 class="h5 mb-3">Add a theatre</h2>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input class="form-control" id="name" name="name" maxlength="100" required>
+      </div>
+      <div class="mb-3">
+        <label for="city" class="form-label">City</label>
+        <input class="form-control" id="city" name="city" maxlength="50" required>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label">Address</label>
+        <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-accent w-100">Add theatre</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

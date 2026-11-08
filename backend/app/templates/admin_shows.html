@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import hhmm, iso with context %}
+{% block title %}Shows & Pricing{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1">Shows &amp; pricing</h1>
+    <p class="text-muted mb-0">Schedule a show and set a price for each seat category.</p>
+  </div>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">&larr; Dashboard</a>
+</div>
+
+<form method="post" action="{{ url_for('admin_show_create') }}" class="cb-card p-4 mb-4 needs-validation" novalidate data-single-submit>
+  <h2 class="h5 mb-3">Schedule a show</h2>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label for="movie_id" class="form-label">Movie</label>
+      <select class="form-select" id="movie_id" name="movie_id" required>
+        <option value="">Choose a movie</option>
+        {% for m in movies %}<option value="{{ m.movie_id }}">{{ m.title }} ({{ m.duration_min }} min)</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label for="screen_id" class="form-label">Screen</label>
+      <select class="form-select" id="screen_id" name="screen_id" required>
+        <option value="">Choose a screen</option>
+        {% for s in screens %}<option value="{{ s.screen_id }}">{{ s.label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-4">
+      <label for="show_date" class="form-label">Date</label>
+      <input type="date" class="form-control" id="show_date" name="show_date" min="{{ today }}" value="{{ today }}" required>
+    </div>
+    <div class="col-6 col-md-4">
+      <label for="start_time" class="form-label">Start time</label>
+      <input type="time" class="form-control" id="start_time" name="start_time" required>
+    </div>
+    <div class="col-12 col-md-4">
+      <label for="end_time" class="form-label">End time <span class="text-muted small">(blank = start + runtime)</span></label>
+      <input type="time" class="form-control" id="end_time" name="end_time">
+    </div>
+    {% for category, default in [('REGULAR', 180), ('PREMIUM', 260), ('RECLINER', 400)] %}
+      <div class="col-4">
+        <label for="price_{{ category }}" class="form-label">{{ category|title }} (&#8377;)</label>
+        <input type="number" class="form-control" id="price_{{ category }}" name="price_{{ category }}" min="0" step="10" value="{{ default }}" required>
+      </div>
+    {% endfor %}
+  </div>
+  <button type="submit" class="btn btn-accent mt-4">Schedule show</button>
+</form>
+
+<h2 class="h5 mb-3">Upcoming shows</h2>
+{% if shows %}
+  <p class="small text-muted">Changing a price only affects new bookings. Tickets already sold keep the price they were bought at.</p>
+  <div class="cb-card table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr class="small text-muted text-uppercase">
+          <th>#</th><th>Date</th><th>Time</th><th>Movie</th><th>Theatre &middot; Screen</th>
+          <th class="text-end">Sold</th><th>Regular</th><th>Premium</th><th>Recliner</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in shows %}
+          <tr>
+            <td class="text-muted">{{ s.show_id }}</td>
+            <td class="text-nowrap" data-date="{{ iso(s.show_date) }}" data-date-relative>{{ iso(s.show_date) }}</td>
+            <td class="text-nowrap">{{ hhmm(s.start_time) }}–{{ hhmm(s.end_time) }}</td>
+            <td class="fw-semibold">{{ s.movie_title }}</td>
+            <td class="small">{{ s.theatre_name }} &middot; {{ s.screen_name }} ({{ s.screen_type }})</td>
+            <td class="text-end">{{ s.sold }}</td>
+            {% for category in ['REGULAR', 'PREMIUM', 'RECLINER'] %}
+              <td>
+                <input type="number" class="form-control form-control-sm price-input" form="price-{{ s.show_id }}"
+                       name="price_{{ category }}" min="0" step="10" required
+                       value="{{ s.prices[category] if s.prices[category] is not none else '' }}"
+                       aria-label="{{ category|title }} price for show {{ s.show_id }}">
+              </td>
+            {% endfor %}
+            <td>
+              <form method="post" id="price-{{ s.show_id }}" action="{{ url_for('admin_show_pricing', show_id=s.show_id) }}" data-single-submit>
+                <button type="submit" class="btn btn-sm btn-outline-light">Save</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty-state">No upcoming shows. Schedule one above.</div>
+{% endif %}
+{% endblock %}

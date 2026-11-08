@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import iso with context %}
+{% block title %}{{ 'Add movie' if is_new else 'Edit movie' }}{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('admin_movies') }}" class="small text-muted text-decoration-none">&larr; All movies</a>
+<h1 class="h3 fw-bold mt-2 mb-4">{{ 'Add a movie' if is_new else 'Edit ' ~ movie.title }}</h1>
+
+<form method="post"
+      action="{{ url_for('admin_movie_create') if is_new else url_for('admin_movie_update', movie_id=movie.movie_id) }}"
+      class="cb-card p-4 needs-validation" novalidate data-single-submit>
+  <div class="row g-3">
+    <div class="col-md-8">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" class="form-control" id="title" name="title" maxlength="200" required value="{{ movie.title or '' }}">
+      <div class="invalid-feedback">Title is required.</div>
+    </div>
+    <div class="col-md-4">
+      <label for="language" class="form-label">Language</label>
+      <input type="text" class="form-control" id="language" name="language" maxlength="50" required
+             list="language-options" value="{{ movie.language or '' }}">
+      <datalist id="language-options">
+        {% for lang in ['Tamil', 'Hindi', 'English', 'Telugu', 'Malayalam', 'Kannada'] %}<option value="{{ lang }}">{% endfor %}
+      </datalist>
+      <div class="invalid-feedback">Language is required.</div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <label for="duration_min" class="form-label">Runtime (minutes)</label>
+      <input type="number" class="form-control" id="duration_min" name="duration_min" min="1" required value="{{ movie.duration_min or '' }}">
+      <div class="invalid-feedback">Above 0.</div>
+    </div>
+    <div class="col-6 col-md-3">
+      <label for="certificate" class="form-label">Certificate</label>
+      <select class="form-select" id="certificate" name="certificate" required>
+        {% for cert in ['U', 'UA', 'A'] %}
+          <option value="{{ cert }}" {% if movie.certificate == cert %}selected{% endif %}>{{ cert }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-3">
+      <label for="release_date" class="form-label">Release date</label>
+      <input type="date" class="form-control" id="release_date" name="release_date" required value="{{ iso(movie.release_date) if movie.release_date else '' }}">
+      <div class="invalid-feedback">Required.</div>
+    </div>
+    <div class="col-6 col-md-3">
+      <label for="rating" class="form-label">Rating (0–10)</label>
+      <input type="number" class="form-control" id="rating" name="rating" min="0" max="10" step="0.1" value="{{ movie.rating if movie.rating is not none else '' }}">
+      <div class="invalid-feedback">Between 0 and 10.</div>
+    </div>
+
+    <div class="col-12">
+      <label for="poster_url" class="form-label">Poster image URL <span class="text-muted small">(optional)</span></label>
+      <input type="url" class="form-control" id="poster_url" name="poster_url" placeholder="https://..." value="{{ movie.poster_url or '' }}">
+    </div>
+    <div class="col-12">
+      <label for="description" class="form-label">Description <span class="text-muted small">(optional)</span></label>
+      <textarea class="form-control" id="description" name="description" rows="3">{{ movie.description or '' }}</textarea>
+    </div>
+
+    <fieldset class="col-12">
+      <legend class="form-label fs-6">Genres</legend>
+      <div class="d-flex flex-wrap gap-3">
+        {% for g in genres %}
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="genre_ids" value="{{ g.genre_id }}" id="genre-{{ g.genre_id }}"
+                   {% if g.genre_id in movie.genre_ids %}checked{% endif %}>
+            <label class="form-check-label" for="genre-{{ g.genre_id }}">{{ g.genre_name }}</label>
+          </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="d-flex gap-2 mt-4">
+    <button type="submit" class="btn btn-accent" data-busy-text="Saving..." data-idle-text="{{ 'Add movie' if is_new else 'Save changes' }}">{{ 'Add movie' if is_new else 'Save changes' }}</button>
+    <a href="{{ url_for('admin_movies') }}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

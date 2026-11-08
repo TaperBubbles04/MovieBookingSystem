@@ -53,6 +53,8 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # ===== DATABASE & AUTH SETUP (import after app creation to avoid circular) =====
 from database import get_db
+from services import admin_service
+import psycopg
 from auth import hash_password, verify_password, create_token, decode_token, get_current_user_from_cookie
 
 # Dependency to get current user from session cookie
@@ -687,6 +689,237 @@ async def admin_dashboard(request: Request):
         "user": user, "stats": stats
     })
 
+
+# ===== ADMIN: MOVIES, THEATRES, SCREENS, SHOWS =====
+
+async def get_admin_user(request: Request):
+    """The logged-in user if they are an ADMIN, otherwise None."""
+    user = await get_current_user(request)
+    return user if user and user.get("role") == "ADMIN" else None
+
+
+def back_to(url: str):
+    return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
+
+
+def form_int(form, key: str, default: int = 0) -> int:
+    value = (form.get(key) or "").strip()
+    return int(value) if value.isdigit() else default
+
+
+@app.get("/admin/movies", response_class=HTMLResponse)
+async def admin_movies(request: Request):
+    """List movies with Add / Edit / Delete"""
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    with get_db() as cur:
+        movies = admin_service.list_movies(cur)
+    return templates.TemplateResponse(request, "admin_movies.html", {"user": user, "movies": movies})
+
+
+@app.get("/admin/movies/new", response_class=HTMLResponse)
+async def admin_movie_new(request: Request):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    with get_db() as cur:
+        genres = admin_service.list_genres(cur)
+    return templates.TemplateResponse(request, "admin_movie_form.html", {
+        "user": user, "movie": {"genre_ids": [], "certificate": "UA"}, "genres": genres, "is_new": True
+    })
+
+
+@app.post("/admin/movies/new", response_class=HTMLResponse)
+async def admin_movie_create(request: Request):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    form = await request.form()
+    movie, errors = admin_service.parse_movie_form(form)
+    if errors:
+        for e in errors:
+            flash(request, e, "error")
+        with get_db() as cur:
+            genres = admin_service.list_genres(cur)
+        return templates.TemplateResponse(request, "admin_movie_form.html", {
+            "user": user, "movie": movie, "genres": genres, "is_new": True
+        }, status_code=400)
+    with get_db() as cur:
+        admin_service.create_movie(cur, movie)
+    flash(request, f"Added {movie['title']}.", "success")
+    return back_to("/admin/movies")
+
+
+@app.get("/admin/movies/{movie_id}/edit", response_class=HTMLResponse)
+async def admin_movie_edit(request: Request, movie_id: int):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    with get_db() as cur:
+        movie = admin_service.get_movie(cur, movie_id)
+        genres = admin_service.list_genres(cur)
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    return templates.TemplateResponse(request, "admin_movie_form.html", {
+        "user": user, "movie": movie, "genres": genres, "is_new": False
+    })
+
+
+@app.post("/admin/movies/{movie_id}/edit", response_class=HTMLResponse)
+async def admin_movie_update(request: Request, movie_id: int):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    form = await request.form()
+    movie, errors = admin_service.parse_movie_form(form)
+    movie["movie_id"] = movie_id
+    if errors:
+        for e in errors:
+            flash(request, e, "error")
+        with get_db() as cur:
+            genres = admin_service.list_genres(cur)
+        return templates.TemplateResponse(request, "admin_movie_form.html", {
+            "user": user, "movie": movie, "genres": genres, "is_new": False
+        }, status_code=400)
+    try:
+        with get_db() as cur:
+            admin_service.update_movie(cur, movie_id, movie)
+    except ValueError as e:
+        flash(request, str(e), "error")
+        return back_to("/admin/movies")
+    flash(request, f"Saved changes to {movie['title']}.", "success")
+    return back_to("/admin/movies")
+
+
+@app.post("/admin/movies/{movie_id}/delete", response_class=HTMLResponse)
+async def admin_movie_delete(request: Request, movie_id: int):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    try:
+        with get_db() as cur:
+            title = admin_service.delete_movie(cur, movie_id)
+        flash(request, f"Deleted {title}.", "success")
+    except psycopg.errors.ForeignKeyViolation:
+        # Show.movie_id is ON DELETE RESTRICT: the database refuses to orphan shows
+        flash(request, "Can't delete this movie: it has scheduled shows. "
+                       "PostgreSQL blocked it with a foreign key constraint.", "error")
+    except ValueError as e:
+        flash(request, str(e), "error")
+    return back_to("/admin/movies")
+
+
+@app.get("/admin/theatres", response_class=HTMLResponse)
+async def admin_theatres(request: Request):
+    """Theatres and screens, with forms to add both"""
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    with get_db() as cur:
+        theatres = admin_service.list_theatres(cur)
+    return templates.TemplateResponse(request, "admin_theatres.html", {"user": user, "theatres": theatres})
+
+
+@app.post("/admin/theatres", response_class=HTMLResponse)
+async def admin_theatre_create(request: Request):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    form = await request.form()
+    name = (form.get("name") or "").strip()
+    try:
+        with get_db() as cur:
+            admin_service.create_theatre(cur, name, (form.get("city") or "").strip(),
+                                         (form.get("address") or "").strip())
+        flash(request, f"Added theatre {name}.", "success")
+    except ValueError as e:
+        flash(request, str(e), "error")
+    return back_to("/admin/theatres")
+
+
+@app.post("/admin/theatres/{theatre_id}/screens", response_class=HTMLResponse)
+async def admin_screen_create(request: Request, theatre_id: int):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    form = await request.form()
+    name = (form.get("screen_name") or "").strip()
+    try:
+        with get_db() as cur:
+            result = admin_service.create_screen(
+                cur, theatre_id, name, form.get("screen_type") or "",
+                form_int(form, "row_count"), form_int(form, "seats_per_row"),
+                form_int(form, "premium_rows"), form_int(form, "recliner_rows"))
+        flash(request, f"Added {name} with {result['seats_created']} seats.", "success")
+    except psycopg.errors.UniqueViolation:
+        flash(request, f"This theatre already has a screen called {name}.", "error")
+    except psycopg.errors.ForeignKeyViolation:
+        flash(request, "Theatre not found.", "error")
+    except ValueError as e:
+        flash(request, str(e), "error")
+    return back_to("/admin/theatres")
+
+
+@app.get("/admin/shows", response_class=HTMLResponse)
+async def admin_shows(request: Request):
+    """Schedule shows and set category prices"""
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    from datetime import date
+    with get_db() as cur:
+        shows = admin_service.list_upcoming_shows(cur)
+        movies = admin_service.list_movies(cur)
+        screens = admin_service.list_screens(cur)
+    return templates.TemplateResponse(request, "admin_shows.html", {
+        "user": user, "shows": shows, "movies": movies, "screens": screens,
+        "today": date.today().isoformat()
+    })
+
+
+@app.post("/admin/shows", response_class=HTMLResponse)
+async def admin_show_create(request: Request):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    from datetime import date, time
+    form = await request.form()
+    try:
+        try:
+            show_date = date.fromisoformat(form.get("show_date") or "")
+            start = time.fromisoformat(form.get("start_time") or "")
+            end = time.fromisoformat(form.get("end_time")) if form.get("end_time") else None
+        except ValueError:
+            raise ValueError("Enter a valid date and start time.")
+        prices = admin_service.parse_prices(form)
+        with get_db() as cur:
+            show_id = admin_service.create_show(
+                cur, form_int(form, "movie_id"), form_int(form, "screen_id"),
+                show_date, start, end, prices)
+        flash(request, f"Scheduled show #{show_id}.", "success")
+    except psycopg.errors.IntegrityError:
+        # trg_prevent_show_overlap or UNIQUE (screen_id, show_date, start_time)
+        flash(request, "That show clashes with another show on the same screen.", "error")
+    except ValueError as e:
+        flash(request, str(e), "error")
+    return back_to("/admin/shows")
+
+
+@app.post("/admin/shows/{show_id}/pricing", response_class=HTMLResponse)
+async def admin_show_pricing(request: Request, show_id: int):
+    user = await get_admin_user(request)
+    if not user:
+        return back_to("/")
+    form = await request.form()
+    try:
+        prices = admin_service.parse_prices(form)
+        with get_db() as cur:
+            admin_service.update_show_prices(cur, show_id, prices)
+        flash(request, f"Updated prices for show #{show_id}.", "success")
+    except ValueError as e:
+        flash(request, str(e), "error")
+    return back_to("/admin/shows")
 
 
 @app.get("/reports/revenue-by-movie", response_class=HTMLResponse)
