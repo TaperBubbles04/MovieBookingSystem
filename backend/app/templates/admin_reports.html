@@ -39,6 +39,12 @@
                 </select>
             </div>
             {% endif %}
+            {% if filters.min_revenue is not none %}
+            <div class="col-md-auto">
+                <label class="form-label small fw-medium">Min revenue (₹)</label>
+                <input type="number" name="min_revenue" value="{{ filters.min_revenue or '' }}" min="0" step="100" class="form-control" style="width: 130px;">
+            </div>
+            {% endif %}
             {% if filters.limit is not none %}
             <div class="col-md-auto">
                 <label class="form-label small fw-medium">Limit</label>

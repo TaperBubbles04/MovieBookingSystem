@@ -688,8 +688,9 @@ async def admin_dashboard(request: Request):
     })
 
 
+
 @app.get("/reports/revenue-by-movie", response_class=HTMLResponse)
-async def report_revenue_by_movie(request: Request, date_from: str = "", date_to: str = ""):
+async def report_revenue_by_movie(request: Request, date_from: str = "", date_to: str = "", min_revenue: str = ""):
     """Revenue by movie report"""
     user = await get_current_user(request)
     if not user or user.get("role") != "ADMIN":
@@ -698,10 +699,12 @@ async def report_revenue_by_movie(request: Request, date_from: str = "", date_to
     from datetime import date
     df = date.fromisoformat(date_from) if date_from else None
     dt = date.fromisoformat(date_to) if date_to else None
+    # The filter form sends an empty string when the box is blank
+    min_rev = int(min_revenue) if min_revenue.strip().isdigit() else 0
 
     with get_db() as cur:
         from services.report_service import get_revenue_by_movie
-        rows = get_revenue_by_movie(cur, df, dt)
+        rows = get_revenue_by_movie(cur, df, dt, min_rev)
 
     report = [{
         "movie_id": r[0], "title": r[1], "total_revenue": r[2],
@@ -710,7 +713,7 @@ async def report_revenue_by_movie(request: Request, date_from: str = "", date_to
 
     return templates.TemplateResponse(request, "admin_reports.html", {
         "user": user, "report": report, "report_type": "revenue-by-movie",
-        "filters": {"date_from": date_from, "date_to": date_to}
+        "filters": {"date_from": date_from, "date_to": date_to, "min_revenue": min_rev}
     })
 
 

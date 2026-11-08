@@ -6,10 +6,18 @@ from datetime import date, timedelta
 from typing import Optional
 
 
-def get_revenue_by_movie(cur, date_from: Optional[date] = None, date_to: Optional[date] = None):
-    """GET /reports/revenue-by-movie"""
+def get_revenue_by_movie(cur, date_from: Optional[date] = None, date_to: Optional[date] = None,
+                         min_revenue: int = 0):
+    """GET /reports/revenue-by-movie
+
+    revenue_report has one row per (show_date, movie, theatre), so roll it up
+    to one row per movie. min_revenue adds the HAVING filter from Query #5.
+    """
     query = """
-        SELECT movie_id, movie_title, total_revenue, tickets_sold, avg_price
+        SELECT movie_id, movie_title,
+               SUM(total_revenue) AS total_revenue,
+               SUM(tickets_sold) AS tickets_sold,
+               COALESCE(ROUND(SUM(total_revenue)::numeric / NULLIF(SUM(tickets_sold), 0)), 0)::int AS avg_price
         FROM revenue_report
     """
     params = []
@@ -24,6 +32,12 @@ def get_revenue_by_movie(cur, date_from: Optional[date] = None, date_to: Optiona
 
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
+
+    query += " GROUP BY movie_id, movie_title"
+
+    if min_revenue and min_revenue > 0:
+        query += " HAVING SUM(total_revenue) >= %s"
+        params.append(min_revenue)
 
     query += " ORDER BY total_revenue DESC"
 
