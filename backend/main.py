@@ -1095,22 +1095,49 @@ async def report_busiest_screens(request: Request):
     })
 
 
+# ===== JSON API (see api.py) =====
+from api import router as api_router, ApiError
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.responses import JSONResponse
+
+app.include_router(api_router)
+
+
+def is_api_request(request: Request) -> bool:
+    return request.url.path.startswith("/api/")
+
+
+@app.exception_handler(ApiError)
+async def api_error_handler(request: Request, exc: ApiError):
+    return JSONResponse({"detail": exc.detail, "code": exc.code}, status_code=exc.status_code)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    if not is_api_request(request):
+        return await request_validation_exception_handler(request, exc)
+    first = exc.errors()[0] if exc.errors() else {}
+    field = ".".join(str(part) for part in first.get("loc", []) if part != "body")
+    message = f"{field}: {first.get('msg', 'invalid value')}" if field else first.get("msg", "Invalid request")
+    return JSONResponse({"detail": message, "code": "VALIDATION_ERROR"}, status_code=422)
+
+
 # ===== ERROR HANDLERS =====
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
+    if is_api_request(request):
+        return JSONResponse({"detail": "Not found", "code": "NOT_FOUND"}, status_code=404)
     user = await get_current_user(request)
     return templates.TemplateResponse(request, "404.html", {"user": user}, status_code=404)
 
 @app.exception_handler(500)
 async def server_error_handler(request: Request, exc: Exception):
+    if is_api_request(request):
+        return JSONResponse({"detail": "Something went wrong on the server", "code": "SERVER_ERROR"},
+                            status_code=500)
     user = await get_current_user(request)
     return templates.TemplateResponse(request, "error.html", {"user": user}, status_code=500)
-
-
-# ===== API ROUTES (to be added later) =====
-# from routers import auth, movies, theatres, shows, bookings, reports
-# app.include_router(auth.router, prefix="/auth", tags=["auth"])
-# ...
 
 if __name__ == "__main__":
     import uvicorn
